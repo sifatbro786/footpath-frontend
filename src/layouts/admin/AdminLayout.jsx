@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // src/layouts/admin/AdminLayout.jsx
 import { useState } from "react";
-import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import { Menu, X, LogOut, ChevronsLeft, ChevronsRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
@@ -50,9 +50,9 @@ const AdminLayout = () => {
                 >
                     {!isCollapsed && (
                         <div className="min-w-0">
-                            <p className="truncate text-lg font-bold text-gray-900">
+                            <Link to="/" className="truncate text-lg font-bold text-gray-900">
                                 Footpath Admin
-                            </p>
+                            </Link>
                             <p className="truncate text-xs text-gray-500">{user?.email}</p>
                         </div>
                     )}

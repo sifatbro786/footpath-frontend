@@ -6,7 +6,6 @@ import {
     ShoppingCart,
     Ticket,
     Megaphone,
-    Tag,
     Image,
     PanelTop,
     FileText,
@@ -31,17 +30,19 @@ export const adminNavGroups = [
     {
         label: "Catalog",
         items: [
+            { label: "Orders", path: "/admin/orders", icon: ShoppingCart },
             { label: "Categories", path: "/admin/categories", icon: FolderTree },
             { label: "Products", path: "/admin/products", icon: Package },
+            { label: "Shipping", path: "/admin/shipping", icon: Truck },
         ],
     },
     {
-        label: "Sales",
+        label: "Marketing",
         items: [
-            { label: "Orders", path: "/admin/orders", icon: ShoppingCart },
             { label: "Coupons", path: "/admin/coupons", icon: Ticket },
             { label: "Campaigns", path: "/admin/campaigns", icon: Megaphone },
-            { label: "Promotions", path: "/admin/promotions", icon: Tag },
+            { label: "Cart Campaigns", path: "/admin/cart-campaigns", icon: ShoppingBag },
+            // { label: "Promotions", path: "/admin/promotions", icon: Tag },
         ],
     },
     {
@@ -59,13 +60,8 @@ export const adminNavGroups = [
         label: "Customers",
         items: [
             { label: "Users", path: "/admin/users", icon: Users },
-            { label: "Carts", path: "/admin/carts", icon: ShoppingBag },
             { label: "Reviews", path: "/admin/reviews", icon: Star },
         ],
-    },
-    {
-        label: "Settings",
-        items: [{ label: "Shipping", path: "/admin/shipping", icon: Truck }],
     },
 ];
 

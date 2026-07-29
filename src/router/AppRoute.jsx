@@ -26,6 +26,9 @@ import CouponManagement from "../pages/admin/coupons/CouponManagement.jsx";
 import CouponForm from "../pages/admin/coupons/CouponForm.jsx";
 import CampaignManagement from "../pages/admin/campaigns/CampaignManagement.jsx";
 import CampaignForm from "../pages/admin/campaigns/CampaignForm.jsx";
+import CartCampaignManager from "../pages/admin/carts/CartCampaignManager.jsx";
+import ShippingManagement from "../pages/admin/shipping/ShippingManagement.jsx";
+import UserManagement from "../pages/admin/users/UserManagement.jsx";
 
 // Paths with a real page built out — excluded from the auto-generated placeholder routes below
 const BUILT_ADMIN_PATHS = ["/admin/categories", "/admin/products", "/admin/orders"];
@@ -48,18 +51,21 @@ const AppRoute = () => {
             </Route>
 
             {/* Admin dashboard — role-gated (role === "admin") */}
-            <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+            <Route element={<PrivateRoute allowedRoles={["admin", "executive"]} />}>
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboardPage />} />
                     <Route path="/admin/categories" element={<CategoriesManagement />} />
                     <Route path="/admin/categories/new" element={<CategoryForm />} />
                     <Route path="/admin/categories/:id/edit" element={<CategoryForm />} />
+
                     <Route path="/admin/products" element={<ProductManagement />} />
                     <Route path="/admin/products/new" element={<ProductForm />} />
                     <Route path="/admin/products/:id" element={<ProductView />} />
                     <Route path="/admin/products/:id/edit" element={<ProductForm />} />
+
                     <Route path="orders" element={<OrdersManagement />} />
                     <Route path="orders/:id" element={<OrderDetail />} />
+
                     <Route path="/admin/coupons" element={<CouponManagement />} />
                     <Route path="/admin/coupons/new" element={<CouponForm />} />
                     <Route path="/admin/coupons/:id/edit" element={<CouponForm />} />
@@ -67,6 +73,10 @@ const AppRoute = () => {
                     <Route path="/admin/campaigns" element={<CampaignManagement />} />
                     <Route path="/admin/campaigns/new" element={<CampaignForm />} />
                     <Route path="/admin/campaigns/:id/edit" element={<CampaignForm />} />
+
+                    <Route path="/admin/cart-campaigns" element={<CartCampaignManager />} />
+                    <Route path="/admin/shipping" element={<ShippingManagement />} />
+                    <Route path="/admin/users" element={<UserManagement />} />
 
                     {/* Every other admin module — placeholder until built out step by step */}
                     {adminNavFlat

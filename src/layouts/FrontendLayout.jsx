@@ -24,7 +24,7 @@ const FrontendLayout = () => {
                     <div className="flex items-center gap-4 text-sm">
                         {isAuthenticated ? (
                             <>
-                                {user?.role === "admin" && (
+                                {user?.role === "admin" || user?.role === "executive" && (
                                     <Link to="/admin" className="text-gray-600 hover:text-gray-900">
                                         Admin
                                     </Link>

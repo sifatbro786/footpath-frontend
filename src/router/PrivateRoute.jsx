@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 // allowedRoles is optional: e.g. <PrivateRoute allowedRoles={["admin"]} />
-// User.role enum (User.js): "user" | "admin" | "editor" | "executive"
+// User.role enum (User.js): "user" | "admin" | "executive"
 const PrivateRoute = ({ allowedRoles }) => {
     const { user, isAuthenticated, loading } = useAuth();
     const location = useLocation();
