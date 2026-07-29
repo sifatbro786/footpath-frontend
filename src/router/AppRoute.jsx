@@ -34,9 +34,6 @@ import SectionManagement from "../pages/admin/sections/SectionManagement.jsx";
 import OfferManagement from "../pages/admin/offers/OfferManagement.jsx";
 import PageMetaManagement from "../pages/admin/pageMeta/PageMetaManagement.jsx";
 
-// Paths with a real page built out — excluded from the auto-generated placeholder routes below
-const BUILT_ADMIN_PATHS = ["/admin/categories", "/admin/products", "/admin/orders"];
-
 const AppRoute = () => {
     return (
         <Routes>
@@ -88,7 +85,7 @@ const AppRoute = () => {
 
                     {/* Every other admin module — placeholder until built out step by step */}
                     {adminNavFlat
-                        .filter((item) => !item.end && !BUILT_ADMIN_PATHS.includes(item.path))
+                        .filter((item) => !item.end)
                         .map((item) => (
                             <Route
                                 key={item.path}
