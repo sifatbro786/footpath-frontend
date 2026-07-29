@@ -6,14 +6,13 @@ import {
     ShoppingCart,
     Ticket,
     Megaphone,
-    Image,
-    PanelTop,
     FileText,
     ListTree,
     Users,
     ShoppingBag,
     Star,
     Truck,
+    LayoutGrid,
 } from "lucide-react";
 
 // Each `path` maps 1:1 to a backend admin route module (see server.js mounts):
@@ -42,18 +41,18 @@ export const adminNavGroups = [
             { label: "Coupons", path: "/admin/coupons", icon: Ticket },
             { label: "Campaigns", path: "/admin/campaigns", icon: Megaphone },
             { label: "Cart Campaigns", path: "/admin/cart-campaigns", icon: ShoppingBag },
-            // { label: "Promotions", path: "/admin/promotions", icon: Tag },
+            { label: "Offer Popups", path: "/admin/offers", icon: FileText },
         ],
     },
     {
         label: "Storefront Content",
         items: [
-            { label: "Hero Slides", path: "/admin/hero-items", icon: Image },
-            { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop },
-            { label: "Offer Popups", path: "/admin/offers", icon: FileText },
-            { label: "A+ Content", path: "/admin/aplus-content", icon: FileText },
+            { label: "Navbar", path: "/admin/navbar", icon: ListTree },
+            { label: "Product Sections", path: "/admin/sections", icon: LayoutGrid },
             { label: "Page Meta / SEO", path: "/admin/page-meta", icon: ListTree },
-            // { label: "Navbar", path: "/admin/navbar", icon: ListTree },
+            // { label: "Hero Slides", path: "/admin/hero-items", icon: Image },
+            // { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop },
+            // { label: "A+ Content", path: "/admin/aplus-content", icon: FileText },
         ],
     },
     {
