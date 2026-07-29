@@ -29,6 +29,7 @@ import CampaignForm from "../pages/admin/campaigns/CampaignForm.jsx";
 import CartCampaignManager from "../pages/admin/carts/CartCampaignManager.jsx";
 import ShippingManagement from "../pages/admin/shipping/ShippingManagement.jsx";
 import UserManagement from "../pages/admin/users/UserManagement.jsx";
+import ReviewManagement from "../pages/admin/reviews/ReviewManagement.jsx";
 
 // Paths with a real page built out — excluded from the auto-generated placeholder routes below
 const BUILT_ADMIN_PATHS = ["/admin/categories", "/admin/products", "/admin/orders"];
@@ -77,6 +78,7 @@ const AppRoute = () => {
                     <Route path="/admin/cart-campaigns" element={<CartCampaignManager />} />
                     <Route path="/admin/shipping" element={<ShippingManagement />} />
                     <Route path="/admin/users" element={<UserManagement />} />
+                    <Route path="/admin/reviews" element={<ReviewManagement />} />
 
                     {/* Every other admin module — placeholder until built out step by step */}
                     {adminNavFlat
