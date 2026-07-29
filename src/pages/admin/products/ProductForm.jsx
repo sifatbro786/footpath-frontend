@@ -63,7 +63,7 @@ const emptyForm = {
     variants: [],
     metaTitle: "",
     metaDescription: "",
-    metaKeywords: "", // comma-separated in the input; array on submit
+    metaKeywords: "",
     attributes: [],
 };
 
@@ -96,8 +96,24 @@ const ProductForm = () => {
     const [tree, setTree] = useState([]);
     const [loading, setLoading] = useState(isEdit);
     const [saving, setSaving] = useState(false);
+    const [attrVocab, setAttrVocab] = useState({});
 
     const set = (patch) => setForm((f) => ({ ...f, ...patch }));
+
+    // Attribute vocabulary for datalist autocomplete
+    useEffect(() => {
+        productApi
+            .getAttributeVocabulary()
+            .then(({ data }) => setAttrVocab(data.attributes || {}))
+            .catch(() => {}); // convenience only
+    }, []);
+
+    const attrKeyOptions = useMemo(() => Object.keys(attrVocab), [attrVocab]);
+    const attrValueOptions = useMemo(() => {
+        const all = new Set();
+        Object.values(attrVocab).forEach((vals) => vals.forEach((v) => all.add(v)));
+        return Array.from(all);
+    }, [attrVocab]);
 
     /* ------------------------------- load -------------------------------- */
     useEffect(() => {
@@ -705,6 +721,16 @@ const ProductForm = () => {
                                 <h2 className="text-base font-semibold text-gray-900">
                                     Attributes
                                 </h2>
+                                <datalist id="product-attr-keys">
+                                    {attrKeyOptions.map((k) => (
+                                        <option key={k} value={k} />
+                                    ))}
+                                </datalist>
+                                <datalist id="product-attr-values">
+                                    {attrValueOptions.map((v) => (
+                                        <option key={v} value={v} />
+                                    ))}
+                                </datalist>
                                 <div className="space-y-2">
                                     {form.attributes.map((attr, i) => (
                                         <div key={i} className="flex items-center gap-2">
@@ -720,6 +746,8 @@ const ProductForm = () => {
                                                     })
                                                 }
                                                 placeholder="Key (e.g. Material)"
+                                                list="product-attr-keys"
+                                                autoComplete="off"
                                                 className={inputCls}
                                             />
                                             <input

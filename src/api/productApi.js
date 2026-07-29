@@ -30,4 +30,13 @@ export const productApi = {
     remove: (id) => axiosInstance.delete(`/admin/products/${id}`),
     // quantity is a DELTA (server does `product.stock += quantity`), not an absolute value
     adjustStock: (id, quantity) => axiosInstance.patch(`/admin/products/${id}/stock`, { quantity }),
+    // Public route: distinct attribute vocabulary from all active products
+    getAttributeVocabulary: () => axiosInstance.get("/products/attributes"),
+
+    // Public route: count products matching exact key/value pair
+    countByAttribute: (key, value) =>
+        axiosInstance.get("/products/filter/multiple-attributes", {
+            params: { attributes: JSON.stringify({ [key]: value }), limit: 1 },
+        }),
 };
+
