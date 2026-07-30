@@ -33,6 +33,7 @@ import ReviewManagement from "../pages/admin/reviews/ReviewManagement.jsx";
 import SectionManagement from "../pages/admin/sections/SectionManagement.jsx";
 import OfferManagement from "../pages/admin/offers/OfferManagement.jsx";
 import PageMetaManagement from "../pages/admin/pageMeta/PageMetaManagement.jsx";
+import NavbarConfiguration from "../pages/admin/navbar/NavbarConfiguration.jsx";
 
 const AppRoute = () => {
     return (
@@ -83,9 +84,11 @@ const AppRoute = () => {
                     <Route path="/admin/offers" element={<OfferManagement />} />
                     <Route path="/admin/page-meta" element={<PageMetaManagement />} />
 
+                    <Route path="/admin/navbar" element={<NavbarConfiguration />} />
+
                     {/* Every other admin module — placeholder until built out step by step */}
                     {adminNavFlat
-                        .filter((item) => !item.end)
+                        .filter((item) => !item.end && !item.built)
                         .map((item) => (
                             <Route
                                 key={item.path}

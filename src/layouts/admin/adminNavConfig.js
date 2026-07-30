@@ -29,37 +29,42 @@ export const adminNavGroups = [
     {
         label: "Catalog",
         items: [
-            { label: "Orders", path: "/admin/orders", icon: ShoppingCart },
-            { label: "Categories", path: "/admin/categories", icon: FolderTree },
-            { label: "Products", path: "/admin/products", icon: Package },
-            { label: "Shipping", path: "/admin/shipping", icon: Truck },
+            { label: "Orders", path: "/admin/orders", icon: ShoppingCart, built: true },
+            { label: "Categories", path: "/admin/categories", icon: FolderTree, built: true },
+            { label: "Products", path: "/admin/products", icon: Package, built: true },
+            { label: "Shipping", path: "/admin/shipping", icon: Truck, built: true },
         ],
     },
     {
         label: "Marketing",
         items: [
-            { label: "Coupons", path: "/admin/coupons", icon: Ticket },
-            { label: "Campaigns", path: "/admin/campaigns", icon: Megaphone },
-            { label: "Cart Campaigns", path: "/admin/cart-campaigns", icon: ShoppingBag },
-            { label: "Offer Popups", path: "/admin/offers", icon: FileText },
+            { label: "Coupons", path: "/admin/coupons", icon: Ticket, built: true },
+            { label: "Campaigns", path: "/admin/campaigns", icon: Megaphone, built: true },
+            {
+                label: "Cart Campaigns",
+                path: "/admin/cart-campaigns",
+                icon: ShoppingBag,
+                built: true,
+            },
+            { label: "Offer Popups", path: "/admin/offers", icon: FileText, built: true },
         ],
     },
     {
         label: "Storefront Content",
         items: [
-            { label: "Navbar", path: "/admin/navbar", icon: ListTree },
-            { label: "Product Sections", path: "/admin/sections", icon: LayoutGrid },
-            { label: "Page Meta / SEO", path: "/admin/page-meta", icon: ListTree },
-            // { label: "Hero Slides", path: "/admin/hero-items", icon: Image },
-            // { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop },
-            // { label: "A+ Content", path: "/admin/aplus-content", icon: FileText },
+            { label: "Navbar", path: "/admin/navbar", icon: ListTree, built: true },
+            { label: "Product Sections", path: "/admin/sections", icon: LayoutGrid, built: true },
+            { label: "Page Meta / SEO", path: "/admin/page-meta", icon: ListTree, built: true },
+            // { label: "Hero Slides", path: "/admin/hero-items", icon: Image }, // built: false (default)
+            // { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop }, // built: false
+            // { label: "A+ Content", path: "/admin/aplus-content", icon: FileText }, // built: false
         ],
     },
     {
         label: "Customers",
         items: [
-            { label: "Users", path: "/admin/users", icon: Users },
-            { label: "Reviews", path: "/admin/reviews", icon: Star },
+            { label: "Users", path: "/admin/users", icon: Users, built: true },
+            { label: "Reviews", path: "/admin/reviews", icon: Star, built: true },
         ],
     },
 ];
