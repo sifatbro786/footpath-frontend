@@ -1,10 +1,10 @@
 // src/pages/admin/sections/SectionManagement.jsx
+import { LayoutGrid, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Plus, LayoutGrid } from "lucide-react";
 import toast from "react-hot-toast";
 import sectionApi from "../../../api/sectionApi";
-import Pagination from "../../../components/admin/common/Pagination";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
+import Pagination from "../../../components/admin/common/Pagination";
 import SectionFormModal from "../../../components/admin/sections/SectionFormModal";
 import { sortSummary } from "../../../components/admin/sections/sectionConstants";
 
@@ -152,7 +152,7 @@ const SectionManagement = () => {
                                             )}
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className="font-mono text-xs text-gray-700">
+                                            <span className="font-label text-xs text-gray-700">
                                                 {s.attributeKey} = {s.attributeValue}
                                             </span>
                                         </td>

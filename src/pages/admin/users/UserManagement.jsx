@@ -225,6 +225,11 @@ const UserManagement = () => {
                                     const sMeta = statusMeta(u.status);
                                     const options = assignableRoles(me?.role);
                                     const rowBusy = busyId === u._id;
+                                    // Mirrors adminController.updateUserRole: only an executive
+                                    // may change another executive's role. Admins get a read-only
+                                    // badge here instead of a control that will always 403.
+                                    const canEditRole =
+                                        me?.role === "executive" || u.role !== "executive";
 
                                     return (
                                         <tr key={u._id} className="hover:bg-gray-50">
@@ -245,8 +250,13 @@ const UserManagement = () => {
                                             </td>
                                             <td className="px-4 py-3 text-gray-500">{u.email}</td>
                                             <td className="px-4 py-3">
-                                                {isSelf ? (
+                                                {isSelf || !canEditRole ? (
                                                     <span
+                                                        title={
+                                                            !isSelf && !canEditRole
+                                                                ? "Only an executive can change another executive's role"
+                                                                : undefined
+                                                        }
                                                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${roleMeta(u.role).badge}`}
                                                     >
                                                         {roleMeta(u.role).label}

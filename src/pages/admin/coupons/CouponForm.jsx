@@ -1,10 +1,10 @@
 // src/pages/admin/coupons/CouponForm.jsx
+import { ArrowLeft, Save, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, X, Search } from "lucide-react";
 import toast from "react-hot-toast";
-import couponApi from "../../../api/couponApi";
+import { useNavigate, useParams } from "react-router-dom";
 import categoryApi from "../../../api/categoryApi";
+import couponApi from "../../../api/couponApi";
 import { productApi } from "../../../api/productApi";
 
 const EMPTY = {
@@ -259,7 +259,7 @@ const CouponForm = () => {
                                         })
                                     }
                                     placeholder="e.g. SUMMER25"
-                                    className={`${inputCls} font-mono uppercase`}
+                                    className={`${inputCls} font-label uppercase`}
                                 />
                             </Field>
                             <Field label="Description">

@@ -1,11 +1,11 @@
 // src/pages/admin/coupons/CouponManagement.jsx
+import { Pencil, Plus, Search, Ticket, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Search, Pencil, Trash2, Ticket } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import couponApi from "../../../api/couponApi";
-import Pagination from "../../../components/admin/common/Pagination";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
+import Pagination from "../../../components/admin/common/Pagination";
 
 const formatBDT = (n) => `\u09F3${Number(n || 0).toLocaleString("en-BD")}`;
 
@@ -200,7 +200,7 @@ const CouponManagement = () => {
                                 coupons.map((c) => (
                                     <tr key={c._id} className="hover:bg-gray-50">
                                         <td className="px-4 py-3">
-                                            <p className="font-mono font-semibold text-gray-900">
+                                            <p className="font-label font-semibold text-gray-900">
                                                 {c.code}
                                             </p>
                                             {c.description && (

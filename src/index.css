@@ -1,1 +1,87 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 @import "tailwindcss";
+
+/* ── Design tokens (single source of truth) ─────────────────────────────
+   Tailwind v4 turns these into utilities: bg-brand, text-ink, font-display… */
+@theme {
+    --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-label: "Archivo", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+    --color-paper: #fbf9f4; /* page background — warm notebook white */
+    --color-paper-dim: #f2efe6; /* hover / subtle fills */
+    --color-ink: #161532; /* headings & primary text — blue-black ink */
+    --color-ink-soft: #4a4869; /* body text */
+    --color-muted: #6b6a82; /* captions, meta */
+    --color-line: #e7e3d8; /* hairlines, borders */
+
+    --color-brand: #2a3fd6; /* marker cobalt — primary actions */
+    --color-brand-dark: #1e2fa8;
+    --color-marigold: #ffc53d; /* highlighter — accents, swipes */
+    --color-coral: #ff5e5b; /* sale / hot */
+    --color-grass: #22b573; /* new / in-stock */
+}
+
+@layer base {
+    body {
+        background-color: var(--color-paper);
+        color: var(--color-ink);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background-color: var(--color-grass);
+        color: var(--color-paper);
+    }
+
+    /* Visible keyboard focus everywhere */
+    :focus-visible {
+        outline: 2px solid var(--color-grass);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+}
+
+/* Graph-paper grid — the stationery signature. Layer over any bg. */
+@utility paper-grid {
+    background-image:
+        linear-gradient(to right, rgb(22 21 50 / 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(22 21 50 / 0.05) 1px, transparent 1px);
+    background-size: 26px 26px;
+}
+
+/* Reusable for the horizontal product rows coming in sections 5–8 */
+@utility no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Slow cinematic push-in on the active hero image (Swiper toggles the class) */
+@media (prefers-reduced-motion: no-preference) {
+    .swiper-slide-active .hero-kenburns {
+        animation: hero-kenburns 7000ms ease-out both;
+    }
+}
+
+@keyframes hero-kenburns {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.09);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}

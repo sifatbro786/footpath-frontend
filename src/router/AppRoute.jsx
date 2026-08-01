@@ -1,18 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import FrontendLayout from "../layouts/FrontendLayout.jsx";
+import StoreLayout from "../layouts/StoreLayout.jsx";
 import AdminLayout from "../layouts/admin/AdminLayout.jsx";
 import { adminNavFlat } from "../layouts/admin/adminNavConfig.js";
 import PrivateRoute from "./PrivateRoute.jsx";
 
 import ForgotPasswordPage from "../pages/client/ForgotPasswordPage.jsx";
-import HomePage from "../pages/client/HomePage.jsx";
+import HomePage from "../pages/store/HomePage.jsx";
 import LoginPage from "../pages/client/LoginPage.jsx";
 import NotFoundPage from "../pages/client/NotFoundPage.jsx";
 import ProfilePage from "../pages/client/ProfilePage.jsx";
 import RegisterPage from "../pages/client/RegisterPage.jsx";
 import ResetPasswordPage from "../pages/client/ResetPasswordPage.jsx";
 import VerifyEmailPage from "../pages/client/VerifyEmailPage.jsx";
-
 import CategoriesManagement from "../pages/admin/category/CategoriesManagement.jsx";
 import CategoryForm from "../pages/admin/category/CategoryForm.jsx";
 import AdminDashboardPage from "../pages/admin/dashboard/AdminDashboardPage.jsx";
@@ -34,19 +33,25 @@ import SectionManagement from "../pages/admin/sections/SectionManagement.jsx";
 import OfferManagement from "../pages/admin/offers/OfferManagement.jsx";
 import PageMetaManagement from "../pages/admin/pageMeta/PageMetaManagement.jsx";
 import NavbarConfiguration from "../pages/admin/navbar/NavbarConfiguration.jsx";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 
 const AppRoute = () => {
     return (
         <Routes>
             {/* Client-facing site */}
-            <Route element={<FrontendLayout />}>
-                <Route path="/" element={<HomePage />} />
+            <Route element={<AuthLayout />}>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+            </Route>
 
+            <Route element={<StoreLayout />}>
+                <Route path="/" element={<HomePage />} />
+                {/* /shop, /cart, /category/:slug ... পরে */}
+
+                {/* logged-in account pages live inside the store shell */}
                 <Route element={<PrivateRoute />}>
                     <Route path="/profile" element={<ProfilePage />} />
                 </Route>

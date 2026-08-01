@@ -353,7 +353,7 @@ const ProductForm = () => {
                     <button
                         onClick={handleSubmit}
                         disabled={saving}
-                        className="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                        className="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
                     >
                         {saving ? "Saving…" : isEdit ? "Update Product" : "Create Product"}
                     </button>

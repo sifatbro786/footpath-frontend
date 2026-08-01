@@ -70,7 +70,7 @@ const ProductView = () => {
                 </div>
                 <button
                     onClick={() => navigate(`/admin/products/${id}/edit`)}
-                    className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
                 >
                     <Pencil size={15} /> Edit
                 </button>
