@@ -30,6 +30,14 @@ export const offerPopupApi = {
         formData.append("image", file);
         return axiosInstance.post("/admin/upload/offer", formData);
     },
+
+    // ── Public (storefront) ──────────────────────────────────────────────
+    // routes/offerPopupRoutes.js -> GET /api/offers/active
+    // Returns only offers where isActive && startDate <= now && (endDate >= now
+    // || endDate == null), already sorted by priority desc then newest first —
+    // so the first element is the one to show.
+    //   -> { success, count, data: [...] }
+    getActive: () => axiosInstance.get("/offers/active"),
 };
 
 export default offerPopupApi;

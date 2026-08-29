@@ -1,4 +1,5 @@
 // src/pages/store/HomePage.jsx
+import Seo from "../../components/common/Seo";
 import Hero from "../../components/store/home/Hero";
 import TrustStrip from "../../components/store/home/TrustStrip";
 import Bestsellers from "../../components/store/home/Bestsellers";
@@ -14,6 +15,14 @@ import Testimonials from "../../components/store/home/Testimonials";
 export default function HomePage() {
     return (
         <>
+            {/* Title/description come from the PageMeta record with slug "home",
+                editable at /admin/page-meta. Falls back if none is configured. */}
+            <Seo
+                slug="home"
+                fallbackTitle="Elmate Stationery — Pens, Notebooks & Desk Supplies"
+                fallbackDescription="Shop pens, notebooks, inks and desk supplies. Delivered across Bangladesh."
+            />
+
             <Hero />
             <TrustStrip />
             <Bestsellers />

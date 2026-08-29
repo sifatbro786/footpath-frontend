@@ -1,111 +1,195 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import StoreLayout from "../layouts/StoreLayout.jsx";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 import AdminLayout from "../layouts/admin/AdminLayout.jsx";
 import { adminNavFlat } from "../layouts/admin/adminNavConfig.js";
 import PrivateRoute from "./PrivateRoute.jsx";
+import { PageLoader } from "../components/common/Skeleton.jsx";
 
-import ForgotPasswordPage from "../pages/client/ForgotPasswordPage.jsx";
+// ─── Storefront (eager) ──────────────────────────────────────────────────────
+// Small, and on the critical path for a first visit — keep in the main bundle.
 import HomePage from "../pages/store/HomePage.jsx";
-import LoginPage from "../pages/client/LoginPage.jsx";
 import NotFoundPage from "../pages/client/NotFoundPage.jsx";
-import ProfilePage from "../pages/client/ProfilePage.jsx";
-import RegisterPage from "../pages/client/RegisterPage.jsx";
-import ResetPasswordPage from "../pages/client/ResetPasswordPage.jsx";
-import VerifyEmailPage from "../pages/client/VerifyEmailPage.jsx";
-import CategoriesManagement from "../pages/admin/category/CategoriesManagement.jsx";
-import CategoryForm from "../pages/admin/category/CategoryForm.jsx";
-import AdminDashboardPage from "../pages/admin/dashboard/AdminDashboardPage.jsx";
-import AdminPlaceholderPage from "../pages/admin/dashboard/AdminPlaceholderPage.jsx";
-import OrdersManagement from "../pages/admin/orders/OrdersManagement.jsx";
-import ProductForm from "../pages/admin/products/ProductForm.jsx";
-import ProductManagement from "../pages/admin/products/ProductManagement.jsx";
-import ProductView from "../pages/admin/products/ProductView.jsx";
-import OrderDetail from "../pages/admin/orders/OrderDetail.jsx";
-import CouponManagement from "../pages/admin/coupons/CouponManagement.jsx";
-import CouponForm from "../pages/admin/coupons/CouponForm.jsx";
-import CampaignManagement from "../pages/admin/campaigns/CampaignManagement.jsx";
-import CampaignForm from "../pages/admin/campaigns/CampaignForm.jsx";
-import CartCampaignManager from "../pages/admin/carts/CartCampaignManager.jsx";
-import ShippingManagement from "../pages/admin/shipping/ShippingManagement.jsx";
-import UserManagement from "../pages/admin/users/UserManagement.jsx";
-import ReviewManagement from "../pages/admin/reviews/ReviewManagement.jsx";
-import SectionManagement from "../pages/admin/sections/SectionManagement.jsx";
-import OfferManagement from "../pages/admin/offers/OfferManagement.jsx";
-import PageMetaManagement from "../pages/admin/pageMeta/PageMetaManagement.jsx";
-import NavbarConfiguration from "../pages/admin/navbar/NavbarConfiguration.jsx";
-import AuthLayout from "../layouts/AuthLayout.jsx";
+import ComingSoonPage from "../pages/store/ComingSoonPage.jsx";
+import OrderSuccessPage from "../pages/store/order/OrderSuccessPage.jsx";
+import OrderFailPage from "../pages/store/order/OrderFailPage.jsx";
+import OrderCancelPage from "../pages/store/order/OrderCancelPage.jsx";
+
+// ─── Auth (lazy) ─────────────────────────────────────────────────────────────
+// Most visitors never sign in; no reason to ship these on first paint.
+const LoginPage = lazy(() => import("../pages/client/LoginPage.jsx"));
+const RegisterPage = lazy(() => import("../pages/client/RegisterPage.jsx"));
+const VerifyEmailPage = lazy(() => import("../pages/client/VerifyEmailPage.jsx"));
+const ForgotPasswordPage = lazy(() => import("../pages/client/ForgotPasswordPage.jsx"));
+const ResetPasswordPage = lazy(() => import("../pages/client/ResetPasswordPage.jsx"));
+const ProfilePage = lazy(() => import("../pages/client/ProfilePage.jsx"));
+
+// ─── Admin (lazy) ────────────────────────────────────────────────────────────
+// PHASE 1: the admin dashboard is the single biggest chunk in the app (21 pages
+// plus recharts) and is reachable by a handful of staff accounts. Shipping it to
+// every shopper was the largest avoidable cost in the bundle.
+const AdminDashboardPage = lazy(() => import("../pages/admin/dashboard/AdminDashboardPage.jsx"));
+const AdminPlaceholderPage = lazy(() => import("../pages/admin/dashboard/AdminPlaceholderPage.jsx"));
+const CategoriesManagement = lazy(() => import("../pages/admin/category/CategoriesManagement.jsx"));
+const CategoryForm = lazy(() => import("../pages/admin/category/CategoryForm.jsx"));
+const ProductManagement = lazy(() => import("../pages/admin/products/ProductManagement.jsx"));
+const ProductForm = lazy(() => import("../pages/admin/products/ProductForm.jsx"));
+const ProductView = lazy(() => import("../pages/admin/products/ProductView.jsx"));
+const OrdersManagement = lazy(() => import("../pages/admin/orders/OrdersManagement.jsx"));
+const OrderDetail = lazy(() => import("../pages/admin/orders/OrderDetail.jsx"));
+const CouponManagement = lazy(() => import("../pages/admin/coupons/CouponManagement.jsx"));
+const CouponForm = lazy(() => import("../pages/admin/coupons/CouponForm.jsx"));
+const CampaignManagement = lazy(() => import("../pages/admin/campaigns/CampaignManagement.jsx"));
+const CampaignForm = lazy(() => import("../pages/admin/campaigns/CampaignForm.jsx"));
+const CartCampaignManager = lazy(() => import("../pages/admin/carts/CartCampaignManager.jsx"));
+const ShippingManagement = lazy(() => import("../pages/admin/shipping/ShippingManagement.jsx"));
+const UserManagement = lazy(() => import("../pages/admin/users/UserManagement.jsx"));
+const ReviewManagement = lazy(() => import("../pages/admin/reviews/ReviewManagement.jsx"));
+const SectionManagement = lazy(() => import("../pages/admin/sections/SectionManagement.jsx"));
+const OfferManagement = lazy(() => import("../pages/admin/offers/OfferManagement.jsx"));
+const PageMetaManagement = lazy(() => import("../pages/admin/pageMeta/PageMetaManagement.jsx"));
+const NavbarConfiguration = lazy(() => import("../pages/admin/navbar/NavbarConfiguration.jsx"));
 
 const AppRoute = () => {
     return (
-        <Routes>
-            {/* Client-facing site */}
-            <Route element={<AuthLayout />}>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/verify-email" element={<VerifyEmailPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-            </Route>
-
-            <Route element={<StoreLayout />}>
-                <Route path="/" element={<HomePage />} />
-                {/* /shop, /cart, /category/:slug ... পরে */}
-
-                {/* logged-in account pages live inside the store shell */}
-                <Route element={<PrivateRoute />}>
-                    <Route path="/profile" element={<ProfilePage />} />
+        <Suspense fallback={<PageLoader />}>
+            <Routes>
+                {/* ─── Auth ─────────────────────────────────────────────── */}
+                <Route element={<AuthLayout />}>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/verify-email" element={<VerifyEmailPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
                 </Route>
-            </Route>
 
-            {/* Admin dashboard — role-gated (role === "admin") */}
-            <Route element={<PrivateRoute allowedRoles={["admin", "executive"]} />}>
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminDashboardPage />} />
-                    <Route path="/admin/categories" element={<CategoriesManagement />} />
-                    <Route path="/admin/categories/new" element={<CategoryForm />} />
-                    <Route path="/admin/categories/:id/edit" element={<CategoryForm />} />
+                {/* ─── Storefront ───────────────────────────────────────── */}
+                <Route element={<StoreLayout />}>
+                    <Route path="/" element={<HomePage />} />
 
-                    <Route path="/admin/products" element={<ProductManagement />} />
-                    <Route path="/admin/products/new" element={<ProductForm />} />
-                    <Route path="/admin/products/:id" element={<ProductView />} />
-                    <Route path="/admin/products/:id/edit" element={<ProductForm />} />
-
-                    <Route path="orders" element={<OrdersManagement />} />
-                    <Route path="orders/:id" element={<OrderDetail />} />
-
-                    <Route path="/admin/coupons" element={<CouponManagement />} />
-                    <Route path="/admin/coupons/new" element={<CouponForm />} />
-                    <Route path="/admin/coupons/:id/edit" element={<CouponForm />} />
-
-                    <Route path="/admin/campaigns" element={<CampaignManagement />} />
-                    <Route path="/admin/campaigns/new" element={<CampaignForm />} />
-                    <Route path="/admin/campaigns/:id/edit" element={<CampaignForm />} />
-
-                    <Route path="/admin/cart-campaigns" element={<CartCampaignManager />} />
-                    <Route path="/admin/shipping" element={<ShippingManagement />} />
-                    <Route path="/admin/users" element={<UserManagement />} />
-                    <Route path="/admin/reviews" element={<ReviewManagement />} />
-                    <Route path="/admin/sections" element={<SectionManagement />} />
-                    <Route path="/admin/offers" element={<OfferManagement />} />
-                    <Route path="/admin/page-meta" element={<PageMetaManagement />} />
-
-                    <Route path="/admin/navbar" element={<NavbarConfiguration />} />
-
-                    {/* Every other admin module — placeholder until built out step by step */}
-                    {adminNavFlat
-                        .filter((item) => !item.end && !item.built)
-                        .map((item) => (
-                            <Route
-                                key={item.path}
-                                path={item.path.replace("/admin/", "")}
-                                element={<AdminPlaceholderPage title={item.label} />}
+                    {/* PHASE 1: every route the storefront links to is now
+                        registered. Before this, /shop, /cart, /checkout,
+                        /category/:slug and /products/:slug all fell through to
+                        NotFound — eight dead links across the home page alone.
+                        Naming follows productMapper's href (/products/:slug),
+                        which was already the de-facto contract. */}
+                    <Route
+                        path="/shop"
+                        element={
+                            <ComingSoonPage
+                                title="The shop"
+                                phase="Phase 3"
+                                description="Full catalogue browsing with filters and sorting is being built."
                             />
-                        ))}
-                </Route>
-            </Route>
+                        }
+                    />
+                    <Route
+                        path="/category/:slug"
+                        element={
+                            <ComingSoonPage
+                                title="Category browsing"
+                                phase="Phase 3"
+                                description="Category pages are being built."
+                            />
+                        }
+                    />
+                    <Route
+                        path="/products/:slug"
+                        element={
+                            <ComingSoonPage
+                                title="Product details"
+                                phase="Phase 4"
+                                description="Product pages with variants, reviews and photos are next up."
+                            />
+                        }
+                    />
+                    <Route
+                        path="/cart"
+                        element={
+                            <ComingSoonPage
+                                title="Your cart"
+                                phase="Phase 5"
+                                description="The full cart page is being built — the cart drawer works in the meantime."
+                            />
+                        }
+                    />
+                    <Route
+                        path="/checkout"
+                        element={
+                            <ComingSoonPage
+                                title="Checkout"
+                                phase="Phase 6"
+                                description="Checkout with delivery options and payment is being built."
+                            />
+                        }
+                    />
 
-            <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+                    {/* Payment gateway lands here. paymentController redirects to
+                        these exact paths, so they must stay in sync with
+                        buildOrderResultUrl() on the backend. Public by design —
+                        guest orders authenticate with a ?token= capability
+                        param, not a session. */}
+                    <Route path="/order/success" element={<OrderSuccessPage />} />
+                    <Route path="/order/fail" element={<OrderFailPage />} />
+                    <Route path="/order/cancel" element={<OrderCancelPage />} />
+
+                    {/* Account pages render inside the store shell */}
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/profile" element={<ProfilePage />} />
+                    </Route>
+                </Route>
+
+                {/* ─── Admin — role gated ───────────────────────────────── */}
+                <Route element={<PrivateRoute allowedRoles={["admin", "executive"]} />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<AdminDashboardPage />} />
+
+                        <Route path="categories" element={<CategoriesManagement />} />
+                        <Route path="categories/new" element={<CategoryForm />} />
+                        <Route path="categories/:id/edit" element={<CategoryForm />} />
+
+                        <Route path="products" element={<ProductManagement />} />
+                        <Route path="products/new" element={<ProductForm />} />
+                        <Route path="products/:id" element={<ProductView />} />
+                        <Route path="products/:id/edit" element={<ProductForm />} />
+
+                        <Route path="orders" element={<OrdersManagement />} />
+                        <Route path="orders/:id" element={<OrderDetail />} />
+
+                        <Route path="coupons" element={<CouponManagement />} />
+                        <Route path="coupons/new" element={<CouponForm />} />
+                        <Route path="coupons/:id/edit" element={<CouponForm />} />
+
+                        <Route path="campaigns" element={<CampaignManagement />} />
+                        <Route path="campaigns/new" element={<CampaignForm />} />
+                        <Route path="campaigns/:id/edit" element={<CampaignForm />} />
+
+                        <Route path="cart-campaigns" element={<CartCampaignManager />} />
+                        <Route path="shipping" element={<ShippingManagement />} />
+                        <Route path="users" element={<UserManagement />} />
+                        <Route path="reviews" element={<ReviewManagement />} />
+                        <Route path="sections" element={<SectionManagement />} />
+                        <Route path="offers" element={<OfferManagement />} />
+                        <Route path="page-meta" element={<PageMetaManagement />} />
+                        <Route path="navbar" element={<NavbarConfiguration />} />
+
+                        {/* Modules with a backend but no UI yet — Phase 9 */}
+                        {adminNavFlat
+                            .filter((item) => !item.end && !item.built)
+                            .map((item) => (
+                                <Route
+                                    key={item.path}
+                                    path={item.path.replace("/admin/", "")}
+                                    element={<AdminPlaceholderPage title={item.label} />}
+                                />
+                            ))}
+                    </Route>
+                </Route>
+
+                <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+        </Suspense>
     );
 };
 

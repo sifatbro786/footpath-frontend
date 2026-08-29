@@ -20,7 +20,10 @@ export default function Bestsellers() {
                 title="What everyone keeps on their desk"
                 description="The pens, pads, and inks our shoppers reorder most."
                 actionLabel="View all"
-                actionHref="/products?sort=popular"
+                // Route contract (Phase 1): /shop is the listing route,
+                // /products/:slug is a single product. This previously pointed
+                // at /products?sort=popular, which matched no route.
+                actionHref="/shop?sort=popular"
             />
 
             <div className="mt-8">
