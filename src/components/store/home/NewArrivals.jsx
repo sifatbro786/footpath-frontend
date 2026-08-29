@@ -1,46 +1,42 @@
 // src/components/store/home/NewArrivals.jsx
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import SectionState from "../ui/SectionState";
+import { SkeletonProductRow } from "../../common/Skeleton";
+import { useProductList } from "../../../hooks/store/useStorefront";
+import { formatPrice, normalizeProducts, upscaleCloudinary } from "../../../lib/store/productMapper";
 
-const taka = (n) => `৳${Number(n).toLocaleString("en-BD")}`;
+/**
+ * New arrivals — GET /api/products?sortBy=newest (Phase 2).
+ *
+ * `newest` sorts by Product.publishDate (falling back to createdAt), which is
+ * the field an admin actually controls — a product can be created long before
+ * it goes on sale.
+ *
+ * This section keeps its own card markup rather than reusing ProductRow: the
+ * washi-tape "New" flag and the date stamp are specific to it.
+ */
 
-// Swap for GET /products?sortBy=publishDate&sortOrder=desc later.
-const products = [
-    {
-        id: "na1",
-        name: "Lamy Safari Fountain Pen — Charcoal",
-        slug: "lamy-safari-fountain-pen-charcoal",
-        price: 2650,
-        added: "02 Aug",
-        image: "https://images.unsplash.com/photo-1546695259-ad30ff3fd643?w=600&q=80",
-    },
-    {
-        id: "na2",
-        name: "Moleskine Classic Notebook — Ruled",
-        slug: "moleskine-classic-notebook-ruled",
-        price: 1490,
-        added: "01 Aug",
-        image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&q=80",
-    },
-    {
-        id: "na3",
-        name: "Tombow Dual Brush Pen Set — 10",
-        slug: "tombow-dual-brush-pen-set-10",
-        price: 1980,
-        added: "31 Jul",
-        image: "https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=600&q=80",
-    },
-    {
-        id: "na4",
-        name: "Blackwing 602 Pencils — Box of 12",
-        slug: "blackwing-602-pencils-box-12",
-        price: 2200,
-        added: "30 Jul",
-        image: "https://images.unsplash.com/photo-1519683109079-d5f539e1542f?w=600&q=80",
-    },
-];
+/** "02 Aug" — the shelf-tag date shown beside each name. */
+const shelfDate = (raw) => {
+    const d = new Date(raw.publishDate || raw.createdAt);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+};
 
 export default function NewArrivals() {
+    const { data: raw = [], isLoading, isError } = useProductList({
+        sortBy: "newest",
+        sortOrder: "desc",
+        limit: 4,
+    });
+
+    if (!isLoading && (isError || raw.length === 0)) return null;
+
+    // Keep the raw record alongside the view-model so the date stamp (not part
+    // of the shared card shape) stays available.
+    const items = normalizeProducts(raw).map((p, i) => ({ ...p, added: shelfDate(raw[i]) }));
+
     return (
         <section className="border-y border-line bg-paper-dim/40">
             <div className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
@@ -65,36 +61,52 @@ export default function NewArrivals() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    {products.map((p) => (
-                        <Link key={p.id} to={`/products/${p.slug}`} className="group block">
-                            <div className="relative overflow-hidden rounded-xl border border-line bg-paper paper-grid">
-                                {/* washi-tape "NEW" — hand-placed, slightly rotated */}
-                                <span className="absolute -left-6 top-3 z-10 -rotate-45 bg-marigold px-8 py-0.5 text-center font-label text-[10px] font-bold uppercase tracking-widest text-ink shadow-sm">
-                                    New
-                                </span>
-                                <img
-                                    src={p.image}
-                                    alt={p.name}
-                                    loading="lazy"
-                                    className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                            </div>
+                <SectionState isLoading={isLoading} skeleton={<SkeletonProductRow count={4} />}>
+                    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                        {items.map((p) => (
+                            <Link key={p.id} to={p.href} className="group block">
+                                <div className="relative overflow-hidden rounded-xl border border-line bg-paper paper-grid">
+                                    <span className="absolute -left-6 top-3 z-10 -rotate-45 bg-marigold px-8 py-0.5 text-center font-label text-[10px] font-bold uppercase tracking-widest text-ink shadow-sm">
+                                        New
+                                    </span>
+                                    <img
+                                        src={upscaleCloudinary(p.image, 600, 600)}
+                                        alt={p.imageAlt}
+                                        loading="lazy"
+                                        className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                </div>
 
-                            <div className="mt-3 flex items-start justify-between gap-2">
-                                <h3 className="line-clamp-2 text-sm font-medium leading-snug text-ink">
-                                    {p.name}
-                                </h3>
-                                <span className="shrink-0 font-label text-[10px] uppercase tracking-wide text-muted">
-                                    {p.added}
-                                </span>
-                            </div>
-                            <p className="mt-1 font-label text-base font-semibold text-ink">
-                                {taka(p.price)}
-                            </p>
-                        </Link>
-                    ))}
-                </div>
+                                <div className="mt-3 flex items-start justify-between gap-2">
+                                    <h3 className="line-clamp-2 text-sm font-medium leading-snug text-ink">
+                                        {p.name}
+                                    </h3>
+                                    {p.added && (
+                                        <span className="shrink-0 font-label text-[10px] uppercase tracking-wide text-muted">
+                                            {p.added}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <p className="mt-1 flex items-baseline gap-2">
+                                    <span className="font-label text-base font-semibold text-ink">
+                                        {p.hasVariants && (
+                                            <span className="text-xs font-normal text-muted">
+                                                from{" "}
+                                            </span>
+                                        )}
+                                        {formatPrice(p.price)}
+                                    </span>
+                                    {p.isOnSale && (
+                                        <span className="font-label text-xs text-muted line-through">
+                                            {formatPrice(p.basePrice)}
+                                        </span>
+                                    )}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                </SectionState>
             </div>
         </section>
     );

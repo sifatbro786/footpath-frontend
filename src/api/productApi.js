@@ -38,5 +38,50 @@ export const productApi = {
         axiosInstance.get("/products/filter/multiple-attributes", {
             params: { attributes: JSON.stringify({ [key]: value }), limit: 1 },
         }),
+
+    // ── Public storefront reads (Phase 2) ────────────────────────────────
+    //
+    // GET /api/products
+    //   -> { success, products, total, totalPages, currentPage, limit, sortBy, sortOrder }
+    //   `sortBy` is an ENUM handled by a switch in getProducts — not a raw
+    //   field name. Valid values ONLY:
+    //     displayOrder | newest | price_asc | price_desc | popularity | rating
+    //   Anything else silently falls through to the default (displayOrder).
+    //   Other params: page, limit, search, category, minPrice, maxPrice,
+    //                 inStock, onSale, discountType, sortOrder.
+    //
+    //   This is the ONLY product endpoint that returns campaign-aware pricing
+    //   (finalPrice / isUnderValidCampaign / campaignInfo). See the warning on
+    //   getFeatured below.
+    getList: (params) => axiosInstance.get("/products", { params }),
+
+    // GET /api/products/featured -> { success, products }
+    //
+    // ⚠️ Returns products where isFeatured && isActive, hard-limited to 10 with
+    // NO pagination and NO sort. More importantly it does NOT compute
+    // finalPrice / isUnderValidCampaign / campaignInfo — it only derives
+    // discountAmount from the base discountType. So a featured product that is
+    // currently in a campaign will show its NON-campaign price here while the
+    // same product shows the campaign price everywhere else. productMapper
+    // degrades safely (falls back to `price`), but the real fix is to run the
+    // campaign block from getProducts in getFeaturedProducts too.
+    getFeatured: () => axiosInstance.get("/products/featured"),
+
+    // GET /api/products/homepage-sections
+    //   -> { success, sections: [{ _id, title, description, sectionType,
+    //         attributeKey, attributeValue, productLimit, backgroundColor,
+    //         textColor, displayOrder, products: [...], totalProducts }] }
+    //
+    // Products come back EMBEDDED in each section, so the homepage needs this
+    // one request — not this plus one /dynamic-section/:id per section. Same
+    // campaign caveat as getFeatured applies to the embedded products.
+    getHomepageSections: () => axiosInstance.get("/products/homepage-sections"),
+
+    // GET /api/products/dynamic-section/:id -> { success, section, products }
+    // Not used by the homepage (see above). Kept for a future "load more" or
+    // standalone section page, where refetching one section in isolation is
+    // what you actually want.
+    getDynamicSection: (sectionId) =>
+        axiosInstance.get(`/products/dynamic-section/${sectionId}`),
 };
 

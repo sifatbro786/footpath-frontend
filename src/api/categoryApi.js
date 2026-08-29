@@ -93,6 +93,27 @@ const categoryApi = {
         const res = await axiosInstance.delete(`/admin/categories/${id}/image`);
         return res.data.data;
     },
+
+    // ── Public storefront read (Phase 2) ─────────────────────────────────
+    //
+    // GET /api/categories -> { success, count, total, data: [...] }
+    //
+    // Runs through APIFeatures, so it PAGINATES BY DEFAULT AT 10 — an explicit
+    // `limit` is required or the storefront silently shows only the first ten
+    // categories. Any real schema field can be used as a filter, so `level: 0`
+    // selects top-level categories (Category.level, set by the model's pre-save
+    // hook; `parentCategory: null` is not usable here because APIFeatures would
+    // pass the literal string "null").
+    //
+    // Note: `sort` takes real field names here (unlike products' sortBy enum).
+    // Do NOT sort by `displayOrder` — getCategoryTree selects that field but it
+    // does not exist on the Category schema; sorting by it is a silent no-op.
+    getPublicList: async ({ level = 0, limit = 12, sort = "name" } = {}) => {
+        const res = await axiosInstance.get("/categories", {
+            params: { level, limit, sort, isActive: true },
+        });
+        return res.data?.data || [];
+    },
 };
 
 // Extract a human-readable error from the backend's `error` key.

@@ -97,3 +97,87 @@ export function normalizeProduct(raw) {
 export function normalizeProducts(list = []) {
     return list.map(normalizeProduct).filter(Boolean);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hero slides  (models/Hero.js via GET /api/hero-items)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The hero design underlines one phrase in marigold, but the backend stores the
+ * headline as a single `title` string with no way to mark that phrase.
+ *
+ * Rather than guess (underlining the last word is arbitrary and reads as a bug
+ * when it lands on "the"), we support an opt-in convention: wrap the phrase in
+ * asterisks in the admin Title field.
+ *
+ *   "The good stuff for your *desk*."  ->  lead "The good stuff for your "
+ *                                          accent "desk"
+ *                                          trail "."
+ *
+ * A title with no asterisks renders plain, with no underline. That keeps every
+ * existing title valid and makes the feature discoverable without a migration.
+ */
+export function parseHeroTitle(title = "") {
+    const match = String(title).match(/^(.*?)\*([^*]+)\*(.*)$/s);
+    if (!match) return { lead: String(title), accent: "", trail: "" };
+    return { lead: match[1], accent: match[2], trail: match[3] };
+}
+
+/**
+ * Raw HeroItem -> flat slide view-model.
+ *
+ * `buttonLink` does not exist on the model (see api/heroApi.js), so the CTA
+ * target falls back to /shop. `duration` is per-slide autoplay seconds.
+ */
+export function normalizeHeroSlide(raw) {
+    if (!raw?.mediaUrl) return null;
+    return {
+        id: raw._id,
+        titleParts: parseHeroTitle(raw.title),
+        subtitle: raw.subtitle || "",
+        ctaLabel: raw.buttonText || "Shop now",
+        ctaHref: raw.buttonLink || "/shop",
+        mediaType: raw.mediaType === "video" ? "video" : "image",
+        mediaUrl: raw.mediaUrl,
+        deviceType: raw.deviceType || "both",
+        // Model default is 5s; Swiper wants milliseconds.
+        durationMs: Math.max(1, Number(raw.duration) || 5) * 1000,
+    };
+}
+
+export function normalizeHeroSlides(list = [], device) {
+    return list
+        .map(normalizeHeroSlide)
+        .filter(Boolean)
+        .filter((s) => !device || s.deviceType === "both" || s.deviceType === device);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Categories  (models/Category.js via GET /api/categories)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Raw Category -> tile view-model.
+ *
+ * `image` is an object ({ url, public_id }), not a string — a category with no
+ * image uploaded has `image: undefined`, so the tile must cope with a null URL
+ * rather than rendering a broken <img>.
+ *
+ * There is no product count on this endpoint, so tiles omit the count chip
+ * rather than displaying a fabricated number.
+ */
+export function normalizeCategory(raw) {
+    if (!raw?.slug) return null;
+    return {
+        id: raw._id,
+        name: raw.name || "",
+        slug: raw.slug,
+        href: `/category/${raw.slug}`,
+        image: raw.image?.url || null,
+        description: raw.description || "",
+    };
+}
+
+export function normalizeCategories(list = []) {
+    return list.map(normalizeCategory).filter(Boolean);
+}

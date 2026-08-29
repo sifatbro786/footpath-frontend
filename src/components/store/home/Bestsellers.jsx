@@ -1,18 +1,28 @@
 // src/components/store/home/Bestsellers.jsx
 import SectionHeader from "../ui/SectionHeader";
 import ProductRow from "../ui/ProductRow";
-import { bestsellers } from "../../../data/store/bestsellers";
+import SectionState from "../ui/SectionState";
+import { SkeletonProductRow } from "../../common/Skeleton";
+import { useProductList } from "../../../hooks/store/useStorefront";
 
 /**
- * Section 5. Static fixtures for now.
+ * Best sellers — GET /api/products?sortBy=popularity (Phase 2).
  *
- * Backend note: the public getProducts projection does NOT return `isFeatured`,
- * so "best sellers" is driven by popularity. Real wiring later:
- *   GET /products?sortBy=purchaseCount&sortOrder=desc&limit=8
- * (purchaseCount IS in the public .select). Then hand `res.data.products`
- * straight to <ProductRow products={...} />.
+ * "Best selling" is driven by Product.purchaseCount, which the controller maps
+ * to `sortBy=popularity`. The public projection does not expose `isFeatured`,
+ * so popularity (not the featured flag) is the honest signal here — the
+ * Featured section covers editor picks separately.
  */
 export default function Bestsellers() {
+    const { data: products = [], isLoading, isError } = useProductList({
+        sortBy: "popularity",
+        sortOrder: "desc",
+        limit: 8,
+    });
+
+    // Nothing to sell yet -> no section at all, rather than an empty shelf.
+    if (!isLoading && (isError || products.length === 0)) return null;
+
     return (
         <section className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
             <SectionHeader
@@ -20,15 +30,18 @@ export default function Bestsellers() {
                 title="What everyone keeps on their desk"
                 description="The pens, pads, and inks our shoppers reorder most."
                 actionLabel="View all"
-                // Route contract (Phase 1): /shop is the listing route,
-                // /products/:slug is a single product. This previously pointed
-                // at /products?sort=popular, which matched no route.
                 actionHref="/shop?sort=popular"
             />
 
             <div className="mt-8">
-                {/* onAddToCart intentionally omitted until cart is wired */}
-                <ProductRow products={bestsellers} layout="shelf4" />
+                <SectionState
+                    isLoading={isLoading}
+                    skeleton={<SkeletonProductRow count={4} />}
+                >
+                    {/* onAddToCart omitted until variants land in Phase 4 —
+                        a one-click add can't pick a variant correctly yet. */}
+                    <ProductRow products={products} layout="shelf4" />
+                </SectionState>
             </div>
         </section>
     );

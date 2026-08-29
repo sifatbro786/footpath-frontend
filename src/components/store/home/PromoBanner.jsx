@@ -1,7 +1,37 @@
 // src/components/store/home/PromoBanner.jsx
 import { Link } from "react-router-dom";
+import { useHeroContent } from "../../../hooks/store/useStorefront";
+
+/**
+ * Promo banner — partially wired to GET /api/hero (HeroContent), Phase 2.
+ *
+ * ⚠️ Read this before "finishing" the wiring: getActiveHeroContent maps its
+ * documents down to `item.mediaUrl` only. title, subtitle, buttonText and
+ * buttonLink all exist on the HeroContent model and are all DISCARDED by the
+ * controller before the response is sent. So this endpoint can supply the
+ * collage imagery — which is a real win, an admin can swap the promo photos
+ * without a deploy — but it cannot supply the headline, the copy, the CTA or
+ * the end date. Those stay hardcoded here.
+ *
+ * To make this section fully admin-driven, change getActiveHeroContent to
+ * return the documents themselves instead of mapping to mediaUrl. That is a
+ * backend change, not a frontend workaround, so it is left for a later phase.
+ *
+ * Fallback images are kept so the banner still looks intentional before any
+ * HeroContent has been uploaded.
+ */
+const FALLBACK_IMAGES = [
+    "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=500&q=80",
+    "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=500&q=80",
+];
 
 export default function PromoBanner() {
+    const { images } = useHeroContent();
+    const [firstImage, secondImage] = [
+        images?.[0] || FALLBACK_IMAGES[0],
+        images?.[1] || FALLBACK_IMAGES[1],
+    ];
+
     return (
         <section className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
             <div className="relative overflow-hidden rounded-2xl border border-line bg-paper paper-grid">
@@ -44,8 +74,9 @@ export default function PromoBanner() {
                             {/* washi tape */}
                             <span className="absolute -top-3 left-1/2 h-5 w-20 -translate-x-1/2 rotate-2 bg-grass/70" />
                             <img
-                                src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=500&q=80"
+                                src={firstImage}
                                 alt="Notebook flatlay"
+                                loading="lazy"
                                 className="h-44 w-full object-cover"
                             />
                             <figcaption className="pt-2 text-center font-label text-[10px] uppercase tracking-widest text-muted">
@@ -56,8 +87,9 @@ export default function PromoBanner() {
                         <figure className="absolute right-6 top-16 w-52 rotate-6 rounded-sm bg-white p-2.5 shadow-[0_12px_30px_-10px_rgba(22,21,50,0.4)]">
                             <span className="absolute -top-3 left-1/2 h-5 w-20 -translate-x-1/2 -rotate-3 bg-marigold/80" />
                             <img
-                                src="https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=500&q=80"
+                                src={secondImage}
                                 alt="Pens flatlay"
+                                loading="lazy"
                                 className="h-40 w-full object-cover"
                             />
                             <figcaption className="pt-2 text-center font-label text-[10px] uppercase tracking-widest text-muted">
