@@ -32,6 +32,33 @@ export const heroApi = {
         axiosInstance.get("/hero-items", { params: device ? { device } : undefined }),
 
     getContent: () => axiosInstance.get("/hero"),
+
+    // ── Admin (Phase 9) ──────────────────────────────────────────────────
+    //
+    // HeroItem CRUD, mounted at /api/admin/hero-items (protect + admin).
+    //
+    // listItems returns EVERY slide including inactive ones. That route was
+    // added in Phase 9: the admin router previously had no GET at all, so the
+    // panel could only see what the public endpoint showed, which filters
+    // isActive and therefore hid exactly the slides an admin needed to fix.
+    //   -> { success, count, data: [...] }
+    listItems: () => axiosInstance.get("/admin/hero-items"),
+    createItem: (payload) => axiosInstance.post("/admin/hero-items", payload),
+    updateItem: (id, payload) => axiosInstance.put(`/admin/hero-items/${id}`, payload),
+    deleteItem: (id) => axiosInstance.delete(`/admin/hero-items/${id}`),
+
+    // Bulk reorder. Body is { items: [{ id, order }] } and it runs a bulkWrite,
+    // so send the whole list, not a delta.
+    reorderItems: (items) => axiosInstance.put("/admin/hero-items", { items }),
+
+    // HeroContent CRUD, mounted at /api/admin/hero-content.
+    //
+    // ⚠️ getAllHeroContent responds with a BARE ARRAY (res.json(content)), not
+    // the { success, data } envelope the rest of the API uses.
+    listContent: () => axiosInstance.get("/admin/hero-content"),
+    createContent: (payload) => axiosInstance.post("/admin/hero-content", payload),
+    updateContent: (id, payload) => axiosInstance.put(`/admin/hero-content/${id}`, payload),
+    deleteContent: (id) => axiosInstance.delete(`/admin/hero-content/${id}`),
 };
 
 export default heroApi;

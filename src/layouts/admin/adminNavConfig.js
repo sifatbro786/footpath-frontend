@@ -13,6 +13,10 @@ import {
     Star,
     Truck,
     LayoutGrid,
+    // Aliased: a bare `Image` import shadows the global Image constructor.
+    Image as ImageIcon,
+    PanelTop,
+    TrendingUp,
 } from "lucide-react";
 
 // Each `path` maps 1:1 to a backend admin route module (see server.js mounts):
@@ -24,7 +28,12 @@ import {
 export const adminNavGroups = [
     {
         label: "Overview",
-        items: [{ label: "Dashboard", path: "/admin", icon: LayoutDashboard, end: true }],
+        items: [
+            { label: "Dashboard", path: "/admin", icon: LayoutDashboard, end: true },
+            // Phase 9: /api/admin/analytics/sales-report existed from the start
+            // and had no UI calling it.
+            { label: "Sales Report", path: "/admin/sales-report", icon: TrendingUp, built: true },
+        ],
     },
     {
         label: "Catalog",
@@ -53,11 +62,11 @@ export const adminNavGroups = [
         label: "Storefront Content",
         items: [
             { label: "Navbar", path: "/admin/navbar", icon: ListTree, built: true },
+            { label: "Hero Slides", path: "/admin/hero-items", icon: ImageIcon, built: true },
+            { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop, built: true },
             { label: "Product Sections", path: "/admin/sections", icon: LayoutGrid, built: true },
+            { label: "A+ Content", path: "/admin/aplus-content", icon: FileText, built: true },
             { label: "Page Meta / SEO", path: "/admin/page-meta", icon: ListTree, built: true },
-            // { label: "Hero Slides", path: "/admin/hero-items", icon: Image }, // built: false (default)
-            // { label: "Hero Content", path: "/admin/hero-content", icon: PanelTop }, // built: false
-            // { label: "A+ Content", path: "/admin/aplus-content", icon: FileText }, // built: false
         ],
     },
     {

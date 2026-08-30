@@ -66,6 +66,11 @@ const SectionManagement = lazy(() => import("../pages/admin/sections/SectionMana
 const OfferManagement = lazy(() => import("../pages/admin/offers/OfferManagement.jsx"));
 const PageMetaManagement = lazy(() => import("../pages/admin/pageMeta/PageMetaManagement.jsx"));
 const NavbarConfiguration = lazy(() => import("../pages/admin/navbar/NavbarConfiguration.jsx"));
+// Phase 9: modules whose backends already existed but had no interface.
+const HeroSlidesManagement = lazy(() => import("../pages/admin/hero/HeroSlidesManagement.jsx"));
+const HeroContentManagement = lazy(() => import("../pages/admin/hero/HeroContentManagement.jsx"));
+const AplusContentManagement = lazy(() => import("../pages/admin/aplus/AplusContentManagement.jsx"));
+const SalesReportPage = lazy(() => import("../pages/admin/analytics/SalesReportPage.jsx"));
 
 const AppRoute = () => {
     return (
@@ -175,6 +180,12 @@ const AppRoute = () => {
                         <Route path="offers" element={<OfferManagement />} />
                         <Route path="page-meta" element={<PageMetaManagement />} />
                         <Route path="navbar" element={<NavbarConfiguration />} />
+
+                        {/* Phase 9 */}
+                        <Route path="hero-items" element={<HeroSlidesManagement />} />
+                        <Route path="hero-content" element={<HeroContentManagement />} />
+                        <Route path="aplus-content" element={<AplusContentManagement />} />
+                        <Route path="sales-report" element={<SalesReportPage />} />
 
                         {/* Modules with a backend but no UI yet — Phase 9 */}
                         {adminNavFlat

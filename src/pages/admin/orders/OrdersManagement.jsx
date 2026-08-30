@@ -2,9 +2,10 @@
 // src/pages/admin/orders/OrdersManagement.jsx
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, RefreshCw, Eye, Package, Clock, CheckCircle2, Wallet } from "lucide-react";
+import { Search, RefreshCw, Eye, Package, Clock, CheckCircle2, Wallet, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { orderApi } from "../../../api/orderApi";
+import { exportCsv } from "../../../lib/admin/exportCsv";
 import Pagination from "../../../components/admin/common/Pagination";
 import OrderStatusBadge from "../../../components/admin/orders/OrderStatusBadge";
 import PaymentStatusBadge from "../../../components/admin/orders/PaymentStatusBadge";
@@ -104,6 +105,51 @@ const OrdersManagement = () => {
             .catch(() => {});
     };
 
+    /**
+     * Export the orders currently listed.
+     *
+     * Scoped to THIS page of results, not the whole collection: getAllOrders is
+     * paginated and the filters above are what the operator actually chose, so
+     * exporting anything else would quietly disagree with what they are looking
+     * at. The button title says as much.
+     *
+     * Customer name and phone are user-supplied, so exportCsv neutralises any
+     * leading =, +, - or @ before writing, otherwise a name like "=HYPERLINK(..)"
+     * executes when the file is opened in Excel.
+     */
+    const handleExport = () => {
+        if (orders.length === 0) {
+            toast.error("There are no orders to export.");
+            return;
+        }
+
+        exportCsv({
+            filename: "orders",
+            columns: [
+                { label: "Order number", key: "orderNumber" },
+                {
+                    label: "Placed",
+                    format: (o) => new Date(o.createdAt).toISOString().slice(0, 10),
+                },
+                { label: "Customer", format: (o) => o.shippingAddress?.name ?? "" },
+                { label: "Phone", format: (o) => o.shippingAddress?.phone ?? "" },
+                { label: "District", format: (o) => o.shippingAddress?.district ?? "" },
+                { label: "Area", format: (o) => o.shippingAddress?.upazila ?? "" },
+                { label: "Items", format: (o) => (o.orderItems ?? []).reduce((n, i) => n + i.quantity, 0) },
+                { label: "Order status", key: "orderStatus" },
+                { label: "Payment method", key: "paymentMethod" },
+                { label: "Payment status", key: "paymentStatus" },
+                { label: "Shipping (BDT)", format: (o) => Math.round(o.shippingPrice || 0) },
+                { label: "Discount (BDT)", format: (o) => Math.round(o.discountAmount || 0) },
+                { label: "Total (BDT)", format: (o) => Math.round(o.totalPrice || 0) },
+                { label: "Due on delivery (BDT)", format: (o) => Math.round(o.remainingAmount || 0) },
+            ],
+            rows: orders,
+        });
+
+        toast.success(`Exported ${orders.length} orders`);
+    };
+
     return (
         <div className="space-y-5 pb-10">
             <div>
@@ -200,6 +246,14 @@ const OrdersManagement = () => {
                             ))}
                         </select>
                     </div>
+                    <button
+                        onClick={handleExport}
+                        title="Export the orders currently listed"
+                        className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        <Download size={14} />
+                        Export
+                    </button>
                     <button
                         onClick={refresh}
                         className="flex items-center gap-1.5 rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"

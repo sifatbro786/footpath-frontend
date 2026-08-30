@@ -111,5 +111,15 @@ export const productApi = {
     // PUT /api/products/:id/view -> { success, viewCount }
     // Fire and forget: a failed view count must never surface to the shopper.
     incrementView: (id) => axiosInstance.put(`/products/${id}/view`),
+
+    // GET /api/admin/products/low-stock -> { success, count, products }
+    //
+    // PHASE 9. Cannot be expressed through getAdminProducts: the threshold is
+    // per product (lowStockAlert), so it needs a field-to-field $expr
+    // comparison. Products with variants report the SUM of variant stock,
+    // because their parent `stock` is usually 0 and meaningless.
+    // Each row carries effectiveStock and threshold.
+    getLowStock: (limit = 10) =>
+        axiosInstance.get("/admin/products/low-stock", { params: { limit } }),
 };
 
