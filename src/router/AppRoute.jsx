@@ -11,11 +11,12 @@ import { PageLoader } from "../components/common/Skeleton.jsx";
 // Small, and on the critical path for a first visit — keep in the main bundle.
 import HomePage from "../pages/store/HomePage.jsx";
 import NotFoundPage from "../pages/client/NotFoundPage.jsx";
-import ComingSoonPage from "../pages/store/ComingSoonPage.jsx";
 import ShopPage from "../pages/store/ShopPage.jsx";
 import CategoryPage from "../pages/store/CategoryPage.jsx";
 import SearchPage from "../pages/store/SearchPage.jsx";
 import ProductDetailPage from "../pages/store/ProductDetailPage.jsx";
+import CartPage from "../pages/store/CartPage.jsx";
+import CheckoutPage from "../pages/store/CheckoutPage.jsx";
 import OrderSuccessPage from "../pages/store/order/OrderSuccessPage.jsx";
 import OrderFailPage from "../pages/store/order/OrderFailPage.jsx";
 import OrderCancelPage from "../pages/store/order/OrderCancelPage.jsx";
@@ -85,26 +86,8 @@ const AppRoute = () => {
                     <Route path="/search" element={<SearchPage />} />
 
                     <Route path="/products/:slug" element={<ProductDetailPage />} />
-                    <Route
-                        path="/cart"
-                        element={
-                            <ComingSoonPage
-                                title="Your cart"
-                                phase="Phase 5"
-                                description="The full cart page is being built — the cart drawer works in the meantime."
-                            />
-                        }
-                    />
-                    <Route
-                        path="/checkout"
-                        element={
-                            <ComingSoonPage
-                                title="Checkout"
-                                phase="Phase 6"
-                                description="Checkout with delivery options and payment is being built."
-                            />
-                        }
-                    />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/checkout" element={<CheckoutPage />} />
 
                     {/* Payment gateway lands here. paymentController redirects to
                         these exact paths, so they must stay in sync with
@@ -114,6 +97,12 @@ const AppRoute = () => {
                     <Route path="/order/success" element={<OrderSuccessPage />} />
                     <Route path="/order/fail" element={<OrderFailPage />} />
                     <Route path="/order/cancel" element={<OrderCancelPage />} />
+
+                    {/* Friendlier permalink for the same receipt. /order/success
+                        stays canonical because the BACKEND hardcodes it in
+                        buildOrderResultUrl; this is an alias, not a replacement,
+                        so both keep working. */}
+                    <Route path="/order-confirmation/:orderId" element={<OrderSuccessPage />} />
 
                     {/* Account pages render inside the store shell */}
                     <Route element={<PrivateRoute />}>
