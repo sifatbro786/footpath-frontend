@@ -16,6 +16,7 @@ import AplusContent from "../../components/store/product/AplusContent";
 import ReviewsSection from "../../components/store/product/ReviewsSection";
 import RelatedProducts from "../../components/store/product/RelatedProducts";
 import ProductJsonLd from "../../components/store/product/ProductJsonLd";
+import WishlistButton from "../../components/store/product/WishlistButton";
 
 import { useProductDetail, useProductViewCounter } from "../../hooks/store/useProductDetail";
 import { useCategoryBySlug } from "../../hooks/store/useCatalog";
@@ -217,11 +218,14 @@ export default function ProductDetailPage() {
                                 />
                             </div>
 
-                            {pricing.sku && (
-                                <p className="mt-6 font-label text-[11px] uppercase tracking-[0.14em] text-ink/35">
-                                    SKU {pricing.sku}
-                                </p>
-                            )}
+                            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                                <WishlistButton productId={product.id} showLabel />
+                                {pricing.sku && (
+                                    <p className="font-label text-[11px] uppercase tracking-[0.14em] text-ink/35">
+                                        SKU {pricing.sku}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
 

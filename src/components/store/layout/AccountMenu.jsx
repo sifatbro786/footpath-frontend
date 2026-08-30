@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, LayoutDashboard, LogIn, UserPlus, LogOut } from "lucide-react";
+import { User, LayoutDashboard, LogIn, UserPlus, LogOut, Package, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../hooks/useAuth";
 
@@ -112,7 +112,30 @@ const AccountMenu = () => {
                         </div>
 
                         <div className="py-1">
-                            <Link to="/profile" data-menu-item onClick={close} className={itemCls}>
+                            <Link
+                                to="/account/orders"
+                                data-menu-item
+                                onClick={close}
+                                className={itemCls}
+                            >
+                                <Package size={16} />
+                                Orders
+                            </Link>
+                            <Link
+                                to="/account/wishlist"
+                                data-menu-item
+                                onClick={close}
+                                className={itemCls}
+                            >
+                                <Heart size={16} />
+                                Saved items
+                            </Link>
+                            <Link
+                                to="/account/profile"
+                                data-menu-item
+                                onClick={close}
+                                className={itemCls}
+                            >
                                 <User size={16} />
                                 Profile
                             </Link>

@@ -46,7 +46,7 @@ const StoreHeader = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, [drawer]);
 
-    const accountHref = isAuthenticated ? "/profile" : "/login";
+    const accountHref = isAuthenticated ? "/account/orders" : "/login";
 
     return (
         <header

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import StoreLayout from "../layouts/StoreLayout.jsx";
 import AuthLayout from "../layouts/AuthLayout.jsx";
 import AdminLayout from "../layouts/admin/AdminLayout.jsx";
@@ -20,6 +20,7 @@ import CheckoutPage from "../pages/store/CheckoutPage.jsx";
 import OrderSuccessPage from "../pages/store/order/OrderSuccessPage.jsx";
 import OrderFailPage from "../pages/store/order/OrderFailPage.jsx";
 import OrderCancelPage from "../pages/store/order/OrderCancelPage.jsx";
+import OrderTrackPage from "../pages/store/order/OrderTrackPage.jsx";
 
 // ─── Auth (lazy) ─────────────────────────────────────────────────────────────
 // Most visitors never sign in; no reason to ship these on first paint.
@@ -28,7 +29,17 @@ const RegisterPage = lazy(() => import("../pages/client/RegisterPage.jsx"));
 const VerifyEmailPage = lazy(() => import("../pages/client/VerifyEmailPage.jsx"));
 const ForgotPasswordPage = lazy(() => import("../pages/client/ForgotPasswordPage.jsx"));
 const ResetPasswordPage = lazy(() => import("../pages/client/ResetPasswordPage.jsx"));
-const ProfilePage = lazy(() => import("../pages/client/ProfilePage.jsx"));
+
+// ─── Account (lazy) ──────────────────────────────────────────────────────────
+// Signed-in area only, so it never ships to a browsing shopper.
+const AccountLayout = lazy(() => import("../layouts/AccountLayout.jsx"));
+const AccountOrdersPage = lazy(() => import("../pages/account/OrdersPage.jsx"));
+const AccountOrderDetailPage = lazy(() => import("../pages/account/OrderDetailPage.jsx"));
+const AccountWishlistPage = lazy(() => import("../pages/account/WishlistPage.jsx"));
+const AccountAddressesPage = lazy(() => import("../pages/account/AddressesPage.jsx"));
+const AccountReviewsPage = lazy(() => import("../pages/account/MyReviewsPage.jsx"));
+const AccountProfilePage = lazy(() => import("../pages/account/ProfilePage.jsx"));
+const AccountPasswordPage = lazy(() => import("../pages/account/PasswordPage.jsx"));
 
 // ─── Admin (lazy) ────────────────────────────────────────────────────────────
 // PHASE 1: the admin dashboard is the single biggest chunk in the app (21 pages
@@ -104,9 +115,30 @@ const AppRoute = () => {
                         so both keep working. */}
                     <Route path="/order-confirmation/:orderId" element={<OrderSuccessPage />} />
 
-                    {/* Account pages render inside the store shell */}
+                    {/* Public guest lookup: order number plus phone, for anyone
+                        who no longer has their confirmation link. */}
+                    <Route path="/order/track" element={<OrderTrackPage />} />
+
+                    {/* Account area, inside the store shell so header, footer
+                        and cart drawer stay put. */}
                     <Route element={<PrivateRoute />}>
-                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/account" element={<AccountLayout />}>
+                            <Route index element={<AccountOrdersPage />} />
+                            <Route path="orders" element={<AccountOrdersPage />} />
+                            <Route
+                                path="orders/:orderNumber"
+                                element={<AccountOrderDetailPage />}
+                            />
+                            <Route path="wishlist" element={<AccountWishlistPage />} />
+                            <Route path="addresses" element={<AccountAddressesPage />} />
+                            <Route path="reviews" element={<AccountReviewsPage />} />
+                            <Route path="profile" element={<AccountProfilePage />} />
+                            <Route path="password" element={<AccountPasswordPage />} />
+                        </Route>
+
+                        {/* Kept so older links and the header menu keep working;
+                            the account area is the real home for this now. */}
+                        <Route path="/profile" element={<Navigate to="/account/profile" replace />} />
                     </Route>
                 </Route>
 

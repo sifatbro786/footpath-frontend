@@ -299,7 +299,7 @@ export default function OrderSuccessPage() {
                         Continue shopping
                     </Link>
                     <Link
-                        to="/profile"
+                        to="/account/orders"
                         className="border border-ink/20 px-6 py-3 text-center font-label text-[11px]
                                    uppercase tracking-[0.18em] text-ink transition-colors hover:border-ink"
                     >
