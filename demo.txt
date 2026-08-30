@@ -1,0 +1,49 @@
+Prothome ekta bhalo khobor: tomar code niye kono chinta nei. Duita repo-i GitHub er sathe sync — kono unpushed commit nei, kono untracked file nei. Oi 92/114 "modified" ta CRLF artifact, real change na.
+
+Ja travel kore na ta holo reasoning — kon contract kemon, kothay trap ache, kon decision keno newa hoyeche. Sheta duita alada jaygay fix korlam, karon problem tao duita.
+
+1. CLAUDE.md — duita repo-r root e
+
+Eta asol answer. Notun kono Claude session e project folder open korle ei file ta automatically load hoy. Git diye travel kore, tai bashay git pull korlei context peye jabe.
+
+Ki ache: architecture map, run instructions, ar sob theke important — 10 ta phase e ja ja trap dhorechilam:
+
+variant er kono _id nei, options array-i identity, ar mismatch hole stock chupchap decrement hoy na
+price sob shomoy server e decide hoy, client er price backend ignore kore
+COD gateway bypass na — advance online e nay
+signed-in order server cart theke ashe, tai cart dual-mode badhyotamulok
+guest order capability token diye protected
+updatedBy: "system" chupchap undefined hoye save hoy
+response envelope inconsistent (ekta table diye rekhechi)
+campaign pricing featured/homepage-sections e apply hoy na
+literal route /:param er age declare korte hobe
+
+Sathe known open issues ar status o ache.
+
+2. Artifact — claude.ai er sidebar e
+
+https://claude.ai/code/artifact/6707152f-ea17-4e76-b6fe-d2831817068b
+
+Ei ta tumi je kono device theke khulte parba — bashar PC, phone, kichu lagbe na, shudhu claude.ai e login. Update kore dilam: phase 0–9 Done, 10 Next up, 11 baki. Upore ekta "Picking this up on another machine" box add korechi.
+
+Sidebar e dekhte: claude.ai/code/artifacts, ba terminal e /artifacts.
+
+Bashay giye ki korba
+bash
+git pull                 # duita repo tei
+npm install              # duita tei
+
+Tarpor Claude e folder open kore bolba ki korte chao. CLAUDE.md nijei load hobe.
+
+Phase 10 shuru korte artifact er prompt starter ta copy koro, ba shudhu bolo: "Phase 10 — hardening. Backend: pino logging, integration test, Swagger, cron lock, unused deps remove. Frontend: zod, skeleton, a11y, Lighthouse."
+
+Ki ki baki
+
+Phase 10 — Hardening (3–4 din)
+Backend: structured logging with PII redaction (ekhon IPN body full log e jay), integration test oi 4 ta jinis er upor jekhane taka involved (pricing, stock decrement, payment verification, guest token auth), Swagger, cron e distributed lock, unused deps (pg, body-parser, node-fetch, express-async-handler) remove, validateBeforeSave: false payment path theke soranо.
+Frontend: zod resolver, skeleton, image lazy-load + srcset, a11y pass, 360px responsive sweep, bundle split (swiper + framer-motion).
+
+Phase 11 — Launch (2–3 din)
+Production env (SSLCommerz live cred, real CORS origin, null-origin bypass off), sitemap/robots/JSON-LD, GA4 + Meta Pixel event, Sentry, Atlas backup + explain() verify, staging e full lifecycle test, rollback plan.
+
+Ekta jinis mone rekho: FOOTPATH_PROJECT_AUDIT.html backend repo root e ache — oita August 29 er, ekhon purono. Artifact tai current.
