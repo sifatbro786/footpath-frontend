@@ -83,5 +83,33 @@ export const productApi = {
     // what you actually want.
     getDynamicSection: (sectionId) =>
         axiosInstance.get(`/products/dynamic-section/${sectionId}`),
+
+    // ── Product detail (Phase 4) ─────────────────────────────────────────
+    //
+    // GET /api/products/slug/:slug -> { success, product }
+    //
+    // Unlike the list endpoints this one IS campaign aware: it computes
+    // finalPrice, isOnSale, isUnderValidCampaign and campaignInfo, applying a
+    // valid campaign in preference to the base discount.
+    //
+    // `includeAplus=true` folds the A+ content document into product.aplusContent
+    // in the same response, which saves a round trip on the page that always
+    // needs it.
+    getBySlug: (slug, { includeAplus = true } = {}) =>
+        axiosInstance.get(`/products/slug/${slug}`, {
+            params: { includeAplus: String(includeAplus) },
+        }),
+
+    // GET /api/products/related?productId&categoryId&limit -> { success, products, total }
+    // Requires a category: passing productId alone makes the controller look the
+    // product up first, so sending categoryId directly saves a query.
+    getRelated: ({ productId, categoryId, limit = 4 }) =>
+        axiosInstance.get("/products/related", {
+            params: { productId, categoryId, limit },
+        }),
+
+    // PUT /api/products/:id/view -> { success, viewCount }
+    // Fire and forget: a failed view count must never surface to the shopper.
+    incrementView: (id) => axiosInstance.put(`/products/${id}/view`),
 };
 

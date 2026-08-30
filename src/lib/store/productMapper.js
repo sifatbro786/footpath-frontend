@@ -32,6 +32,27 @@ export function getPrimaryImage(raw) {
 }
 
 /**
+ * Second image, used for the hover swap on product cards.
+ *
+ * Looks for another shot of the SAME item first (second image in group one),
+ * then falls back to the first image of the next group. Returns null when the
+ * product only has one photo, so the card can skip the swap entirely rather
+ * than cross-fading an image into itself.
+ */
+export function getSecondaryImage(raw) {
+    const groups = raw?.imageGroups;
+    if (!Array.isArray(groups) || groups.length === 0) return null;
+
+    const sameGroup = groups[0]?.images?.[1];
+    if (sameGroup?.url) return { url: sameGroup.url, alt: sameGroup.alt || raw?.name || "" };
+
+    const nextGroup = groups[1]?.images?.[0];
+    if (nextGroup?.url) return { url: nextGroup.url, alt: nextGroup.alt || raw?.name || "" };
+
+    return null;
+}
+
+/**
  * Cloudinary URLs are stored as 200x200 thumbnails (Product.js pre-save hook
  * rewrites /upload/ -> /upload/w_200,h_200,c_fill/). For larger card renders,
  * request a bigger transform on the fly instead of upscaling a 200px image.
@@ -72,9 +93,15 @@ export function getDiscountPercent(raw) {
 export function normalizeProduct(raw) {
     if (!raw) return null;
     const image = getPrimaryImage(raw);
+    const hover = getSecondaryImage(raw);
     const price = Number(raw.finalPrice ?? raw.price ?? raw.basePrice) || 0;
     const basePrice = Number(raw.basePrice) || price;
     const isOnSale = Boolean(raw.isOnSale) && price < basePrice;
+
+    // Campaign state is computed server-side in getProducts. Note that
+    // /products/featured and /products/homepage-sections do NOT compute it, so
+    // these fields are simply absent there rather than false-but-wrong.
+    const onCampaign = Boolean(raw.isUnderValidCampaign);
 
     return {
         id: raw._id ?? raw.id,
@@ -83,10 +110,13 @@ export function normalizeProduct(raw) {
         href: `/products/${raw.slug ?? ""}`,
         image: image.url,
         imageAlt: image.alt,
+        hoverImage: hover?.url ?? null,
         price,
         basePrice,
         isOnSale,
         discountPercent: isOnSale ? getDiscountPercent(raw) : 0,
+        onCampaign,
+        campaignName: onCampaign ? (raw.campaignInfo?.campaignName ?? null) : null,
         rating: Number(raw.averageRating) || 0,
         numReviews: Number(raw.numReviews) || 0,
         inStock: (Number(raw.stock) || 0) > 0,

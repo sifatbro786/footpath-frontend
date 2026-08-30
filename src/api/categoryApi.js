@@ -114,6 +114,20 @@ const categoryApi = {
         });
         return res.data?.data || [];
     },
+
+    // Public nested tree for the storefront: active categories only, no admin
+    // content fields. -> [{ _id, name, slug, children: [...] }]
+    //
+    // Unlike getPublicList this is NOT paginated (getCategoryTree does not run
+    // through APIFeatures), so it returns the whole tree in one request. That
+    // makes it the right source for the filter sidebar, slug resolution and
+    // breadcrumbs alike — see lib/store/categoryTree.js.
+    getTreePublic: async ({ maxDepth = 3 } = {}) => {
+        const res = await axiosInstance.get("/categories/tree", {
+            params: { includeInactive: false, includeContent: false, maxDepth },
+        });
+        return res.data?.data || [];
+    },
 };
 
 // Extract a human-readable error from the backend's `error` key.

@@ -12,6 +12,10 @@ import { PageLoader } from "../components/common/Skeleton.jsx";
 import HomePage from "../pages/store/HomePage.jsx";
 import NotFoundPage from "../pages/client/NotFoundPage.jsx";
 import ComingSoonPage from "../pages/store/ComingSoonPage.jsx";
+import ShopPage from "../pages/store/ShopPage.jsx";
+import CategoryPage from "../pages/store/CategoryPage.jsx";
+import SearchPage from "../pages/store/SearchPage.jsx";
+import ProductDetailPage from "../pages/store/ProductDetailPage.jsx";
 import OrderSuccessPage from "../pages/store/order/OrderSuccessPage.jsx";
 import OrderFailPage from "../pages/store/order/OrderFailPage.jsx";
 import OrderCancelPage from "../pages/store/order/OrderCancelPage.jsx";
@@ -74,36 +78,13 @@ const AppRoute = () => {
                         NotFound — eight dead links across the home page alone.
                         Naming follows productMapper's href (/products/:slug),
                         which was already the de-facto contract. */}
-                    <Route
-                        path="/shop"
-                        element={
-                            <ComingSoonPage
-                                title="The shop"
-                                phase="Phase 3"
-                                description="Full catalogue browsing with filters and sorting is being built."
-                            />
-                        }
-                    />
-                    <Route
-                        path="/category/:slug"
-                        element={
-                            <ComingSoonPage
-                                title="Category browsing"
-                                phase="Phase 3"
-                                description="Category pages are being built."
-                            />
-                        }
-                    />
-                    <Route
-                        path="/products/:slug"
-                        element={
-                            <ComingSoonPage
-                                title="Product details"
-                                phase="Phase 4"
-                                description="Product pages with variants, reviews and photos are next up."
-                            />
-                        }
-                    />
+                    {/* Catalogue (Phase 3). All three run the same CatalogView
+                        over getProducts; they differ only in scope and heading. */}
+                    <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/category/:slug" element={<CategoryPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+
+                    <Route path="/products/:slug" element={<ProductDetailPage />} />
                     <Route
                         path="/cart"
                         element={

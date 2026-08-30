@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, Search, ShoppingBag, User, ChevronRight } from "lucide-react";
+import { Link, NavLink } from "react-router-dom";
+import { Menu, X, ShoppingBag, User, ChevronRight } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
 import { useCart } from "../../../hooks/useCart";
-import { navLinks } from "../../../data/store/navData";
+import { navLinks as fallbackNavLinks } from "../../../data/store/navData";
+import { useNavbarLinks } from "../../../hooks/store/useCatalog";
 import AccountMenu from "./AccountMenu";
+import SearchAutocomplete from "./SearchAutocomplete";
 
 const StoreHeader = () => {
     const { isAuthenticated } = useAuth();
     const { itemCount, openCart } = useCart();
-    const navigate = useNavigate();
+
+    // Nav comes from /api/navbar/config, managed at /admin/navbar.
+    // The static list is kept as a fallback for the first paint and for the
+    // case where the config request fails: a header with no navigation at all
+    // is a worse failure than a slightly stale one.
+    const { links: apiLinks, isSuccess } = useNavbarLinks();
+    const navLinks = isSuccess && apiLinks.length > 0 ? apiLinks : fallbackNavLinks;
 
     const [drawer, setDrawer] = useState(false);
-    const [query, setQuery] = useState("");
     const [scrolled, setScrolled] = useState(false);
 
     // Subtle shadow once the page scrolls
@@ -39,14 +46,7 @@ const StoreHeader = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, [drawer]);
 
-    const submitSearch = (e) => {
-        e.preventDefault();
-        const term = query.trim();
-        navigate(term ? `/shop?search=${encodeURIComponent(term)}` : "/shop");
-        setDrawer(false);
-    };
-
-    const accountHref = isAuthenticated ? "/account" : "/login";
+    const accountHref = isAuthenticated ? "/profile" : "/login";
 
     return (
         <header
@@ -74,22 +74,11 @@ const StoreHeader = () => {
                 </Link>
 
                 {/* Desktop / tablet search */}
-                <form onSubmit={submitSearch} className="hidden flex-1 md:block" role="search">
-                    <div className="relative mx-auto max-w-xl">
-                        <Search
-                            size={18}
-                            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
-                        />
-                        <input
-                            type="search"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search pens, notebooks, art supplies…"
-                            aria-label="Search products"
-                            className="w-full rounded-md border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-grass focus:outline-none focus:ring-2 focus:ring-grass/20"
-                        />
+                <div className="hidden flex-1 md:block">
+                    <div className="mx-auto max-w-xl">
+                        <SearchAutocomplete />
                     </div>
-                </form>
+                </div>
 
                 {/* Right actions */}
                 <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
@@ -145,26 +134,9 @@ const StoreHeader = () => {
             </nav>
 
             {/* ── Mobile search (always visible under the top row) ───── */}
-            <form
-                onSubmit={submitSearch}
-                className="border-t border-line px-4 py-2.5 md:hidden"
-                role="search"
-            >
-                <div className="relative">
-                    <Search
-                        size={17}
-                        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
-                    />
-                    <input
-                        type="search"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search products…"
-                        aria-label="Search products"
-                        className="w-full rounded-md border border-line bg-white py-2 pl-10 pr-4 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                    />
-                </div>
-            </form>
+            <div className="border-t border-line px-4 py-2.5 md:hidden">
+                <SearchAutocomplete compact />
+            </div>
 
             {/* ── Mobile drawer ───────────────────────────────────────── */}
             {/* Always mounted so it can never fail to render — visibility is
