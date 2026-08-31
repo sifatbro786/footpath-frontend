@@ -56,6 +56,14 @@ export default function BuyBox({
                         <Plus size={15} />
                     </button>
                 </div>
+
+                {/* Say WHY the stepper stopped. A control that silently refuses
+                    to move reads as broken, not as a stock limit. */}
+                {!canIncrease && !disabled && Number.isFinite(maxQuantity) && (
+                    <span className="font-label text-[11px] uppercase tracking-[0.14em] text-coral">
+                        {maxQuantity === 1 ? "Last one" : `Only ${maxQuantity} left`}
+                    </span>
+                )}
             </div>
 
             <div className="flex flex-col gap-2.5 sm:flex-row">

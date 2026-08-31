@@ -5,12 +5,25 @@
  * caps, value right. No card, no shadow, no icons.
  */
 export default function ProductSpecs({ product }) {
-    const { description, bulletPoints, attributes, brand, sku } = product;
+    const { description, bulletPoints, attributes, brand, sku, weight, dimensions } = product;
 
-    // Brand and SKU are useful spec rows but live outside `attributes`, so fold
-    // them in rather than printing them somewhere separate.
+    // Brand, SKU, size and weight are useful spec rows but live outside
+    // `attributes`, so fold them in rather than printing them separately.
+    // Size goes near the top: for stationery it is the field people scan for.
     const rows = [
         ...(brand ? [{ key: "Brand", value: brand }] : []),
+        ...(dimensions
+            ? [
+                  {
+                      key: "Size",
+                      value: [dimensions.length, dimensions.width, dimensions.height]
+                          .filter((n) => n > 0)
+                          .join(" × ")
+                          .concat(" cm"),
+                  },
+              ]
+            : []),
+        ...(weight ? [{ key: "Weight", value: `${weight} g` }] : []),
         ...(sku ? [{ key: "SKU", value: sku }] : []),
         ...attributes,
     ];

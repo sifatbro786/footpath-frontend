@@ -1,5 +1,6 @@
 // src/pages/admin/navbar/NavbarConfiguration.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import navbarApi from "../../../api/navbarApi";
@@ -59,6 +60,7 @@ const Toggle = ({ on, onClick, label }) => (
 );
 
 const NavbarConfiguration = () => {
+    const queryClient = useQueryClient();
     const [config, setConfig] = useState({
         logo: { url: "", public_id: "" },
         logoUrl: "/",
@@ -208,6 +210,12 @@ const NavbarConfiguration = () => {
             await navbarApi.updateConfig(payload);
             toast.success("Navbar saved");
             await load(); // re-sync with the canonical server copy (paths, ids)
+
+            // The storefront header reads this config through React Query. This
+            // page talks to axios directly, so without an explicit invalidation
+            // the header would keep serving its cached copy and the admin would
+            // think the save had not worked.
+            queryClient.invalidateQueries({ queryKey: ["store", "navbar"] });
         } catch (err) {
             const apiErrs = err.response?.data?.errors;
             toast.error(

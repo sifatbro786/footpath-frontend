@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import SectionState from "../ui/SectionState";
 import { SkeletonProductRow } from "../../common/Skeleton";
 import { useProductList } from "../../../hooks/store/useStorefront";
-import { formatPrice, normalizeProducts, upscaleCloudinary } from "../../../lib/store/productMapper";
+import { formatPrice, normalizeProducts, upscaleCloudinary, handleImageError } from "../../../lib/store/productMapper";
 
 /**
  * New arrivals — GET /api/products?sortBy=newest (Phase 2).
@@ -74,6 +74,7 @@ export default function NewArrivals() {
                                         alt={p.imageAlt}
                                         loading="lazy"
                                         className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        onError={handleImageError}
                                     />
                                 </div>
 

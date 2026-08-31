@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { handleImageError } from "../../../lib/store/productMapper";
 
 /**
  * Product gallery.
@@ -74,6 +75,7 @@ export default function ProductGallery({ images = [], activeGroup = null }) {
                                 alt=""
                                 loading="lazy"
                                 className="h-full w-full object-cover"
+                                onError={handleImageError}
                             />
                         </button>
                     ))}
@@ -99,6 +101,7 @@ export default function ProductGallery({ images = [], activeGroup = null }) {
                               }
                             : undefined
                     }
+                    onError={handleImageError}
                 />
                 {!zooming && (
                     <span className="pointer-events-none absolute bottom-3 right-3 bg-paper/90 px-2.5 py-1 font-label text-[10px] uppercase tracking-[0.16em] text-ink/50">
@@ -128,6 +131,7 @@ export default function ProductGallery({ images = [], activeGroup = null }) {
                                 alt={i === 0 ? image.alt : ""}
                                 loading={i === 0 ? "eager" : "lazy"}
                                 className="h-full w-full object-cover"
+                                onError={handleImageError}
                             />
                         </div>
                     ))}

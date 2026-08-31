@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useProductSuggestions } from "../../../hooks/store/useCatalog";
-import { formatPrice, upscaleCloudinary } from "../../../lib/store/productMapper";
+import { formatPrice, upscaleCloudinary, handleImageError } from "../../../lib/store/productMapper";
 
 /**
  * Header search with a suggestion dropdown.
@@ -149,6 +149,7 @@ export default function SearchAutocomplete({ onNavigate, autoFocus = false, comp
                                                 alt=""
                                                 loading="lazy"
                                                 className="h-11 w-11 shrink-0 border border-line object-cover"
+                                                onError={handleImageError}
                                             />
                                             <span className="min-w-0 flex-1">
                                                 <span className="block truncate text-[13.5px] text-ink">

@@ -6,6 +6,7 @@ import AdminLayout from "../layouts/admin/AdminLayout.jsx";
 import { adminNavFlat } from "../layouts/admin/adminNavConfig.js";
 import PrivateRoute from "./PrivateRoute.jsx";
 import { PageLoader } from "../components/common/Skeleton.jsx";
+import { INFO_PAGES } from "../data/store/infoPages.js";
 
 // ─── Storefront (eager) ──────────────────────────────────────────────────────
 // Small, and on the critical path for a first visit — keep in the main bundle.
@@ -17,6 +18,10 @@ import SearchPage from "../pages/store/SearchPage.jsx";
 import ProductDetailPage from "../pages/store/ProductDetailPage.jsx";
 import CartPage from "../pages/store/CartPage.jsx";
 import CheckoutPage from "../pages/store/CheckoutPage.jsx";
+// Brand pages: static copy, small, and linked from the navbar and footer.
+const AboutPage = lazy(() => import("../pages/store/AboutPage.jsx"));
+const ContactPage = lazy(() => import("../pages/store/ContactPage.jsx"));
+const InfoPage = lazy(() => import("../pages/store/InfoPage.jsx"));
 import OrderSuccessPage from "../pages/store/order/OrderSuccessPage.jsx";
 import OrderFailPage from "../pages/store/order/OrderFailPage.jsx";
 import OrderCancelPage from "../pages/store/order/OrderCancelPage.jsx";
@@ -104,6 +109,15 @@ const AppRoute = () => {
                     <Route path="/products/:slug" element={<ProductDetailPage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
+
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+
+                    {/* Policy and help pages. All five share InfoPage and get
+                        their copy from data/store/infoPages.js. */}
+                    {Object.entries(INFO_PAGES).map(([slug, page]) => (
+                        <Route key={slug} path={`/${slug}`} element={<InfoPage {...page} />} />
+                    ))}
 
                     {/* Payment gateway lands here. paymentController redirects to
                         these exact paths, so they must stay in sync with

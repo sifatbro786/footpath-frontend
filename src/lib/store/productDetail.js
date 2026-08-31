@@ -108,6 +108,22 @@ export function normalizeProductDetail(raw) {
         lowStockAlert: Number(raw.lowStockAlert) || 5,
 
         attributes: (raw.attributes ?? []).filter((a) => a?.key && a?.value),
+
+        // Physical dimensions were on the model from the start and never
+        // surfaced. For stationery they are one of the first things a buyer
+        // checks: "A5" means nothing until you see 21 by 14.8cm. Zero means
+        // "not measured" (the schema default), so both are normalised to null
+        // rather than rendering a row of zeroes.
+        weight: Number(raw.weight) > 0 ? Number(raw.weight) : null,
+        dimensions:
+            raw.dimensions &&
+            (raw.dimensions.length > 0 || raw.dimensions.width > 0 || raw.dimensions.height > 0)
+                ? {
+                      length: Number(raw.dimensions.length) || 0,
+                      width: Number(raw.dimensions.width) || 0,
+                      height: Number(raw.dimensions.height) || 0,
+                  }
+                : null,
         category: raw.category
             ? { id: raw.category._id, name: raw.category.name, slug: raw.category.slug }
             : null,

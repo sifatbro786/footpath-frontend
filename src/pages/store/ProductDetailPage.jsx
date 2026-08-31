@@ -53,7 +53,11 @@ export default function ProductDetailPage() {
     useEffect(() => {
         setSelection(product?.hasVariants ? defaultSelection(product.variants) : {});
         setQuantity(1);
-    }, [product?.id, product?.hasVariants, product?.variants]);
+        // Keyed on the product id alone. Depending on `product.variants` here
+        // meant the effect re-ran whenever that array got a new identity, which
+        // reset the quantity the instant anyone changed it.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product?.id]);
 
     useProductViewCounter(product?.id);
 
@@ -171,13 +175,23 @@ export default function ProductDetailPage() {
                             </h1>
 
                             {product.numReviews > 0 && (
-                                <a
-                                    href="#reviews"
+                                // A bare href="#reviews" writes the hash into
+                                // the router's location, which re-renders the
+                                // route and lands you back at the top of the
+                                // same page. Scroll explicitly and leave the URL
+                                // alone.
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        document
+                                            .getElementById("reviews")
+                                            ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                                    }
                                     className="mt-3 inline-flex items-center gap-2 font-label text-[11px] uppercase tracking-[0.14em] text-ink/50 underline underline-offset-4 transition-colors hover:text-ink"
                                 >
                                     {product.rating.toFixed(1)} out of 5 · {product.numReviews}{" "}
                                     {product.numReviews === 1 ? "review" : "reviews"}
-                                </a>
+                                </button>
                             )}
 
                             <div className="mt-7">

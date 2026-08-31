@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu, X, ShoppingBag, User, ChevronRight } from "lucide-react";
+import { Menu, X, ShoppingBag, User, ChevronRight, Heart } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
 import { useCart } from "../../../hooks/useCart";
 import { navLinks as fallbackNavLinks } from "../../../data/store/navData";
@@ -16,7 +16,7 @@ const StoreHeader = () => {
     // The static list is kept as a fallback for the first paint and for the
     // case where the config request fails: a header with no navigation at all
     // is a worse failure than a slightly stale one.
-    const { links: apiLinks, isSuccess } = useNavbarLinks();
+    const { links: apiLinks, icons, isSuccess } = useNavbarLinks();
     const navLinks = isSuccess && apiLinks.length > 0 ? apiLinks : fallbackNavLinks;
 
     const [drawer, setDrawer] = useState(false);
@@ -73,31 +73,47 @@ const StoreHeader = () => {
                     <img src="/logo.png" alt="Elmate Stationery" className="h-9 w-auto" />
                 </Link>
 
-                {/* Desktop / tablet search */}
-                <div className="hidden flex-1 md:block">
-                    <div className="mx-auto max-w-xl">
-                        <SearchAutocomplete />
+                {/* Desktop / tablet search. Hidden when the admin turns the
+                    search icon off in Navbar settings. */}
+                {icons.search && (
+                    <div className="hidden flex-1 md:block">
+                        <div className="mx-auto max-w-xl">
+                            <SearchAutocomplete />
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {/* Right actions */}
+                {/* Right actions, each gated by its Navbar settings toggle */}
                 <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
-                    <AccountMenu />
+                    {icons.wishlist && isAuthenticated && (
+                        <Link
+                            to="/account/wishlist"
+                            aria-label="Saved items"
+                            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-ink-soft transition hover:bg-paper-dim"
+                        >
+                            <Heart size={20} />
+                            <span className="sr-only">Saved items</span>
+                        </Link>
+                    )}
 
-                    <button
-                        type="button"
-                        onClick={openCart}
-                        aria-label={`Open cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
-                        className="relative flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-ink-soft transition hover:bg-paper-dim"
-                    >
-                        <ShoppingBag size={20} />
-                        <span className="hidden sm:inline">Cart</span>
-                        {itemCount > 0 && (
-                            <span className="absolute -right-0.5 -top-0.5 grid h-4.5 min-w-4.5 place-items-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
-                                {itemCount > 99 ? "99+" : itemCount}
-                            </span>
-                        )}
-                    </button>
+                    {icons.user && <AccountMenu />}
+
+                    {icons.cart && (
+                        <button
+                            type="button"
+                            onClick={openCart}
+                            aria-label={`Open cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
+                            className="relative flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-ink-soft transition hover:bg-paper-dim"
+                        >
+                            <ShoppingBag size={20} />
+                            <span className="hidden sm:inline">Cart</span>
+                            {itemCount > 0 && (
+                                <span className="absolute -right-0.5 -top-0.5 grid h-4.5 min-w-4.5 place-items-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
+                                    {itemCount > 99 ? "99+" : itemCount}
+                                </span>
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -133,10 +149,12 @@ const StoreHeader = () => {
                 </ul>
             </nav>
 
-            {/* ── Mobile search (always visible under the top row) ───── */}
-            <div className="border-t border-line px-4 py-2.5 md:hidden">
-                <SearchAutocomplete compact />
-            </div>
+            {/* ── Mobile search (under the top row, same toggle as desktop) ── */}
+            {icons.search && (
+                <div className="border-t border-line px-4 py-2.5 md:hidden">
+                    <SearchAutocomplete compact />
+                </div>
+            )}
 
             {/* ── Mobile drawer ───────────────────────────────────────── */}
             {/* Always mounted so it can never fail to render — visibility is
@@ -194,16 +212,18 @@ const StoreHeader = () => {
                     </ul>
                 </nav>
 
-                <div className="border-t border-line p-4">
-                    <Link
-                        to={accountHref}
-                        onClick={() => setDrawer(false)}
-                        className="flex items-center justify-center gap-2 rounded-md bg-grass px-4 py-3 text-sm font-semibold text-white transition hover:bg-grass/90"
-                    >
-                        <User size={18} />
-                        {isAuthenticated ? "My account" : "Login / Register"}
-                    </Link>
-                </div>
+                {icons.user && (
+                    <div className="border-t border-line p-4">
+                        <Link
+                            to={accountHref}
+                            onClick={() => setDrawer(false)}
+                            className="flex items-center justify-center gap-2 rounded-md bg-grass px-4 py-3 text-sm font-semibold text-white transition hover:bg-grass/90"
+                        >
+                            <User size={18} />
+                            {isAuthenticated ? "My account" : "Login / Register"}
+                        </Link>
+                    </div>
+                )}
             </aside>
         </header>
     );

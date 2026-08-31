@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatPrice, upscaleCloudinary } from "../../../lib/store/productMapper";
+import { formatPrice, upscaleCloudinary, handleImageError } from "../../../lib/store/productMapper";
 
 /**
  * Presentational card. Expects a NORMALIZED product (see normalizeProduct).
@@ -62,6 +62,7 @@ export default function ProductCard({ product, onAddToCart }) {
                         inStock ? "" : "opacity-60",
                         hoverImage && hoverLoaded ? "group-hover:opacity-0" : "",
                     ].join(" ")}
+                    onError={handleImageError}
                 />
 
                 {hoverImage && (
@@ -71,8 +72,14 @@ export default function ProductCard({ product, onAddToCart }) {
                         aria-hidden="true"
                         loading="lazy"
                         onLoad={() => setHoverLoaded(true)}
-                        className="absolute inset-0 h-full w-full object-cover opacity-0
-                                   transition-opacity duration-300 group-hover:opacity-100"
+                        // A dead hover image must not swap in over a working
+                        // primary: leave it hidden rather than showing the
+                        // placeholder on hover.
+                        onError={() => setHoverLoaded(false)}
+                        className={`absolute inset-0 h-full w-full object-cover opacity-0
+                                   transition-opacity duration-300 ${
+                                       hoverLoaded ? "group-hover:opacity-100" : ""
+                                   }`}
                     />
                 )}
 

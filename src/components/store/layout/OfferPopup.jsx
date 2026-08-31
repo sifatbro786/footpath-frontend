@@ -26,7 +26,16 @@ const SHOW_DELAY_MS = 1200; // let the page paint before interrupting
 
 const todayStamp = () => new Date().toISOString().slice(0, 10);
 
-const wasDismissed = (offer) => {
+/**
+ * Has this offer already had its turn?
+ *
+ * FIX: the seen-marker used to be written only when someone clicked the close
+ * button. Reloading the page without dismissing recorded nothing, so the popup
+ * reappeared on every single reload. It is now recorded the moment the popup is
+ * SHOWN, which is what "once" and "daily" actually mean: once seen, not once
+ * dismissed.
+ */
+const wasSeen = (offer) => {
     if (!offer?._id) return true;
     if (offer.displayFrequency === "always") return false;
 
@@ -41,7 +50,7 @@ const wasDismissed = (offer) => {
     }
 };
 
-const recordDismissal = (offer) => {
+const recordSeen = (offer) => {
     if (!offer?._id || offer.displayFrequency === "always") return;
     try {
         localStorage.setItem(STORAGE_PREFIX + offer._id, todayStamp());
@@ -62,8 +71,15 @@ const OfferPopup = () => {
     });
 
     useEffect(() => {
-        if (!offer || wasDismissed(offer)) return;
-        const id = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
+        if (!offer || wasSeen(offer)) return;
+
+        const id = setTimeout(() => {
+            setVisible(true);
+            // Mark it seen here, not on dismiss. Whether they close it, click
+            // through, or just navigate away, they have seen this offer.
+            recordSeen(offer);
+        }, SHOW_DELAY_MS);
+
         return () => clearTimeout(id);
     }, [offer]);
 
@@ -76,10 +92,8 @@ const OfferPopup = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible]);
 
-    const dismiss = () => {
-        recordDismissal(offer);
-        setVisible(false);
-    };
+    // Already recorded as seen when it appeared, so closing is just closing.
+    const dismiss = () => setVisible(false);
 
     if (!offer) return null;
 

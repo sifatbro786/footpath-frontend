@@ -3,21 +3,32 @@ import { Mail, Phone } from "lucide-react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+// FIX: this list contained eleven dead links. The category slugs did not match
+// any seeded category, /track was the wrong path for order tracking, and
+// /shipping, /returns, /faq, /privacy, /terms, /stores and /blog had no routes
+// at all. Every target below now resolves.
+//
+// Category slugs MUST match scripts/seedStorefront.js. If you rename a category
+// there, rename it here.
+//
+// Dropped on purpose: "Stores" (the shop is online only, as the Contact page
+// says) and "Blog" (there is no blog, and a link to an empty one is worse than
+// no link).
 const columns = [
     {
         title: "Shop",
         links: [
-            { label: "Pens & Writing", to: "/category/pens-writing" },
-            { label: "Notebooks", to: "/category/notebooks" },
-            { label: "Art Supplies", to: "/category/art-supplies" },
-            { label: "Ink & Refills", to: "/category/ink-refills" },
-            { label: "New Arrivals", to: "/shop?sort=newest" },
+            { label: "Notebooks & Journals", to: "/category/notebooks-and-journals" },
+            { label: "Writing Instruments", to: "/category/writing-instruments" },
+            { label: "Desk & Office", to: "/category/desk-and-office" },
+            { label: "New arrivals", to: "/shop?sort=newest" },
+            { label: "Deals & bundles", to: "/shop?deal=active" },
         ],
     },
     {
         title: "Help",
         links: [
-            { label: "Track your order", to: "/track" },
+            { label: "Track your order", to: "/order/track" },
             { label: "Shipping & delivery", to: "/shipping" },
             { label: "Returns & refunds", to: "/returns" },
             { label: "FAQ", to: "/faq" },
@@ -28,8 +39,6 @@ const columns = [
         title: "Company",
         links: [
             { label: "About Elmate", to: "/about" },
-            { label: "Stores", to: "/stores" },
-            { label: "Blog", to: "/blog" },
             { label: "Privacy policy", to: "/privacy" },
             { label: "Terms of service", to: "/terms" },
         ],

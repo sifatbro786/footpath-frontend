@@ -117,9 +117,30 @@ const fromServerItem = (item) => {
               }
             : undefined,
         variantLabel: item.variant?.displayName,
-        stock: undefined, // server cart does not return per line stock
+        // Effective stock for THIS line. With variants the sellable count lives
+        // on the matching variant row; the parent `stock` is usually 0 and
+        // meaningless for those products. Undefined only when the product could
+        // not be populated, in which case the stepper falls back to unlimited
+        // and the server still enforces the real ceiling.
+        stock: resolveLineStock(product, options),
     };
 };
+
+/** Stock for a cart line: the matching variant's, or the product's. */
+function resolveLineStock(product, options) {
+    if (!product) return undefined;
+
+    if (product.hasVariants && options.length > 0) {
+        const variant = (product.variants ?? []).find((v) =>
+            options.every((opt) =>
+                v.options?.some((vo) => vo.name === opt.name && vo.value === opt.value),
+            ),
+        );
+        return variant ? Number(variant.stock) || 0 : undefined;
+    }
+
+    return Number.isFinite(Number(product.stock)) ? Number(product.stock) : undefined;
+}
 
 export const CartProvider = ({ children }) => {
     const { isAuthenticated, loading: authLoading } = useAuth();
@@ -233,11 +254,16 @@ export const CartProvider = ({ children }) => {
             setItems((prev) => {
                 const existing = prev.find((i) => i.key === key);
                 if (existing) {
-                    return prev.map((i) =>
-                        i.key === key ? { ...i, quantity: i.quantity + qty } : i,
-                    );
+                    // Same clamp as updateQty: adding to a line already at the
+                    // stock ceiling must not push it past.
+                    const ceiling = Number.isFinite(existing.stock ?? item.stock)
+                        ? (existing.stock ?? item.stock)
+                        : Infinity;
+                    const next = Math.min(existing.quantity + qty, ceiling);
+                    return prev.map((i) => (i.key === key ? { ...i, quantity: next } : i));
                 }
-                return [...prev, { ...item, key, quantity: qty }];
+                const ceiling = Number.isFinite(item.stock) ? item.stock : Infinity;
+                return [...prev, { ...item, key, quantity: Math.min(qty, ceiling) }];
             });
             setIsOpen(true);
 
@@ -264,17 +290,36 @@ export const CartProvider = ({ children }) => {
         async (key, qty) => {
             const line = items.find((i) => i.key === key);
 
+            // Clamp to stock BEFORE writing. Previously the optimistic update
+            // accepted any number, the server rejected it, and the reload
+            // snapped the figure back — which looks like the control fighting
+            // you. The server still enforces the real ceiling; this just stops
+            // the UI from promising something it cannot deliver.
+            const ceiling = Number.isFinite(line?.stock) ? line.stock : Infinity;
+            const target = qty <= 0 ? 0 : Math.min(qty, ceiling);
+
+            if (target > 0 && line && target === line.quantity) {
+                if (qty > ceiling) {
+                    setNotice(
+                        ceiling === 1
+                            ? `Only 1 left of ${line.name}.`
+                            : `Only ${ceiling} left of ${line.name}.`,
+                    );
+                }
+                return; // nothing changed; do not round-trip
+            }
+
             setItems((prev) =>
-                qty <= 0
+                target <= 0
                     ? prev.filter((i) => i.key !== key)
-                    : prev.map((i) => (i.key === key ? { ...i, quantity: qty } : i)),
+                    : prev.map((i) => (i.key === key ? { ...i, quantity: target } : i)),
             );
 
             if (!isAuthenticated || !line?.itemId) return;
 
             try {
-                if (qty <= 0) await cartApi.removeItem(line.itemId);
-                else await cartApi.updateItem(line.itemId, qty);
+                if (target <= 0) await cartApi.removeItem(line.itemId);
+                else await cartApi.updateItem(line.itemId, target);
                 await loadServerCart();
             } catch (error) {
                 setNotice(error?.response?.data?.message ?? "Could not update your bag.");

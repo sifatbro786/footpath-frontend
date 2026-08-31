@@ -192,7 +192,12 @@ export default function AplusEditorModal({ target, onClose, onSaved }) {
             .getByProductId(target.productId)
             .then(({ data }) => {
                 if (cancelled) return;
-                const existing = data?.data;
+                // ⚠️ This endpoint returns { success, aplusContent }, NOT the
+                // { success, data } envelope most of the API uses. Reading
+                // `data.data` here silently yielded undefined, so the editor
+                // opened blank even for a product that already had content, and
+                // saving then wiped it.
+                const existing = data?.aplusContent ?? data?.data;
                 if (!existing) return;
                 setTitle(existing.title ?? "");
                 setSections(

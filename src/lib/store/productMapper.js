@@ -62,6 +62,24 @@ export function upscaleCloudinary(url, w = 600, h = 600) {
     return url.replace(/\/upload\/w_\d+,h_\d+,c_fill\//, `/upload/w_${w},h_${h},c_fill/`);
 }
 
+/**
+ * onError handler for any product image.
+ *
+ * A `src` guard only covers a MISSING url. It does nothing when the url is
+ * present but dead: a deleted Cloudinary asset, an expired external link, a
+ * typo in an admin paste. Those render the browser's broken-image icon, which
+ * looks like the site is broken rather than the photo.
+ *
+ * Swaps to the placeholder once and then detaches itself, so a placeholder that
+ * somehow also fails cannot loop.
+ */
+export function handleImageError(event) {
+    const img = event.currentTarget;
+    if (img.dataset.fallbackApplied) return;
+    img.dataset.fallbackApplied = "true";
+    img.src = FALLBACK_IMAGE.url;
+}
+
 export function formatPrice(amount, { symbol = CURRENCY_SYMBOL } = {}) {
     const n = Number(amount);
     if (!Number.isFinite(n)) return `${symbol}0`;

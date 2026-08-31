@@ -1,4 +1,4 @@
-import { formatPrice, upscaleCloudinary } from "../../../lib/store/productMapper";
+import { formatPrice, upscaleCloudinary, handleImageError } from "../../../lib/store/productMapper";
 import CouponBox from "../cart/CouponBox";
 
 /**
@@ -47,6 +47,7 @@ export default function OrderSummary({
                                 alt=""
                                 loading="lazy"
                                 className="h-16 w-16 border border-line object-cover"
+                                onError={handleImageError}
                             />
                             <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 font-label text-[10px] tabular-nums text-paper">
                                 {item.quantity}

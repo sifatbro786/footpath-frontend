@@ -1,6 +1,6 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatPrice, upscaleCloudinary } from "../../../lib/store/productMapper";
+import { formatPrice, upscaleCloudinary, handleImageError } from "../../../lib/store/productMapper";
 
 /**
  * One cart line. Shared by the drawer and the cart page so quantity rules can
@@ -30,6 +30,7 @@ export default function CartLine({ item, onUpdateQty, onRemove, compact = false 
                     className={`border border-line object-cover ${
                         compact ? "h-20 w-20" : "h-24 w-24 sm:h-28 sm:w-28"
                     }`}
+                    onError={handleImageError}
                 />
             </Link>
 

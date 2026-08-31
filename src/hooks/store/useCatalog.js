@@ -61,7 +61,13 @@ export const useCatalogParams = () => {
             minPrice: minPrice === null ? "" : minPrice,
             maxPrice: maxPrice === null ? "" : maxPrice,
             inStock: searchParams.get("inStock") === "true",
-            onSale: searchParams.get("onSale") === "true",
+            // `deal=active` is accepted as an alias for `onSale=true` so the
+            // navbar's "Deals and Bundles" link (/shop?deal=active) reads well
+            // and still filters. Without this the link would land on an
+            // unfiltered shop, which looks like a broken promotion.
+            onSale:
+                searchParams.get("onSale") === "true" ||
+                searchParams.get("deal") === "active",
             minRating: minRating ? Number(minRating) : 0,
             attributes,
             sort: searchParams.get("sort") || DEFAULT_SORT,
@@ -109,6 +115,11 @@ export const useCatalogParams = () => {
 
                         if (isEmpty) next.delete(paramKey);
                         else next.set(paramKey, String(value));
+
+                        // Turning "On offer" off must also clear the `deal`
+                        // alias, or the filter reads as onSale again on the
+                        // next render and the chip cannot be dismissed.
+                        if (paramKey === "onSale") next.delete("deal");
                     }
 
                     if (resetPage && !("page" in patch)) next.delete("page");
@@ -126,6 +137,8 @@ export const useCatalogParams = () => {
                 const next = new URLSearchParams();
                 // A search term is the user's query, not a filter — clearing
                 // filters on a results page must not throw away what they typed.
+                // `deal` IS dropped: it is an entry point alias for onSale, and
+                // "clear filters" should genuinely clear.
                 const term = prev.get("search");
                 if (term) next.set("search", term);
                 return next;
@@ -283,23 +296,76 @@ export const useNavbarLinks = () => {
     const query = useQuery({
         queryKey: catalogKeys.navbar(),
         queryFn: () => navbarApi.getConfig().then((r) => r.data?.data ?? null),
-        staleTime: 30 * 60 * 1000,
+        // FIX: this was 30 minutes, which meant an admin could save the navbar
+        // and not see the change on the storefront for half an hour. The config
+        // is one small document that only changes on a deliberate admin action,
+        // so a short window plus a focus refetch costs almost nothing and makes
+        // edits feel immediate. The admin page also invalidates this key on save
+        // (see NavbarConfiguration), which covers the same-tab case.
+        staleTime: 30 * 1000,
+        refetchOnWindowFocus: true,
     });
 
     const links = useMemo(() => {
         const items = query.data?.items ?? [];
+
         return items
             .filter((item) => item.isActive !== false)
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((item) => {
-                let to = item.customUrl || item.path || "/shop";
-                if (item.type === "category" && item.category?.slug) {
-                    to = `/category/${item.category.slug}`;
-                }
-                return { id: item._id, label: item.name, to };
+                const to = resolveNavItemHref(item);
+                return to ? { id: item._id, label: item.name, to } : null;
             })
-            .filter((link) => link.label && link.to);
+            .filter((link) => link && link.label);
     }, [query.data]);
 
-    return { ...query, links };
+    /**
+     * Header action icons, from the same config document.
+     *
+     * These four booleans have existed on NavbarConfig since the start and the
+     * storefront never read them, so the admin toggles appeared to do nothing.
+     *
+     * Defaults are `true`: until the config loads, showing the icons and then
+     * hiding one is far less jarring than an empty header that suddenly grows
+     * controls. `?? true` also means an older config document missing these
+     * keys behaves as it did before.
+     */
+    const icons = useMemo(
+        () => ({
+            cart: query.data?.cartIcon ?? true,
+            search: query.data?.searchIcon ?? true,
+            user: query.data?.userIcon ?? true,
+            wishlist: query.data?.wishlistIcon ?? true,
+        }),
+        [query.data],
+    );
+
+    return { ...query, links, icons };
 };
+
+/**
+ * One nav item to an href, defensively.
+ *
+ * ⚠️ `item.path` is NOT trustworthy for category items. navbarItemSchema's
+ * pre-save hook builds it as `/category/<ObjectId>` rather than
+ * `/category/<slug>`, so the stored value routes to a category page that can
+ * never resolve. The controller populates `category` to { _id, name, slug },
+ * so the slug is the only correct source.
+ *
+ * Returns null for an item we cannot route safely, so a misconfigured entry
+ * disappears from the header instead of becoming a dead link.
+ */
+function resolveNavItemHref(item) {
+    if (item.type === "category") {
+        return item.category?.slug ? `/category/${item.category.slug}` : null;
+    }
+
+    const candidate = (item.customUrl || item.path || "").trim();
+    if (!candidate) return null;
+
+    // Reject the ObjectId-shaped path the pre-save hook can leave behind on an
+    // item that was a category and later changed type.
+    if (/^\/category\/[a-f0-9]{24}$/i.test(candidate)) return null;
+
+    return candidate;
+}

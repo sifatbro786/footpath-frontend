@@ -49,13 +49,15 @@ export const adminNavGroups = [
         items: [
             { label: "Coupons", path: "/admin/coupons", icon: Ticket, built: true },
             { label: "Campaigns", path: "/admin/campaigns", icon: Megaphone, built: true },
-            // {
-            //     label: "Cart Campaigns",
-            //     path: "/admin/cart-campaigns",
-            //     icon: ShoppingBag,
-            //     built: true,
-            // },
-            // { label: "Offer Popups", path: "/admin/offers", icon: FileText, built: true },
+            {
+                label: "Cart Campaigns",
+                path: "/admin/cart-campaigns",
+                icon: ShoppingBag,
+                built: true,
+            },
+            // Controls the storefront popup: copy, image, button, date window,
+            // priority, and how often it reappears (once / daily / always).
+            { label: "Offer Popups", path: "/admin/offers", icon: FileText, built: true },
         ],
     },
     {

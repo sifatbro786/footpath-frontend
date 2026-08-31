@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 import { productApi } from "../../api/productApi";
@@ -29,9 +29,17 @@ export const useProductDetail = (slug) => {
         retry: false, // a 404 here means the slug is wrong; retrying cannot help
     });
 
+    // MUST be memoised. normalizeProductDetail builds fresh objects and arrays
+    // every call, so without this `product` and `product.variants` get a new
+    // identity on every render. Any effect depending on them then fires on
+    // every render — which is exactly what pinned the quantity stepper to 1:
+    // pressing "+" re-rendered, the reset effect saw a "changed" variants array
+    // and set quantity back to 1, forever.
+    const product = useMemo(() => normalizeProductDetail(query.data), [query.data]);
+
     return {
         ...query,
-        product: normalizeProductDetail(query.data),
+        product,
         aplusContent: query.data?.aplusContent ?? null,
         notFound: query.isError && query.error?.response?.status === 404,
     };
