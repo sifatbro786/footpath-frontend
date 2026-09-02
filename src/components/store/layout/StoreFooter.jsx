@@ -1,5 +1,6 @@
 // src/components/store/layout/StoreFooter.jsx
 import { Mail, Phone } from "lucide-react";
+import toast from "react-hot-toast";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -45,6 +46,15 @@ const columns = [
     },
 ];
 
+// Newsletter is a placeholder. There is no subscribe endpoint on the backend
+// and no list to add anyone to, so the submit only acknowledges itself. Swap
+// the toast for the request when a real endpoint lands, and keep the reset.
+function handleSubscribe(e) {
+    e.preventDefault();
+    e.currentTarget.reset();
+    toast.success("Thanks. We will email you when new stock lands.");
+}
+
 export default function StoreFooter() {
     return (
         <footer className="border-t border-line bg-ink text-paper">
@@ -60,7 +70,7 @@ export default function StoreFooter() {
                         </p>
                     </div>
                     <form
-                        onSubmit={(e) => e.preventDefault()}
+                        onSubmit={handleSubscribe}
                         className="flex w-full max-w-md gap-2"
                     >
                         <input
@@ -130,34 +140,55 @@ export default function StoreFooter() {
                 ))}
             </div>
 
+            {/* Payment methods. Supplied gateway strip, on a paper panel because
+                the artwork is dark on transparency and would vanish on bg-ink.
+                It is 5011x587 (two rows, ~8.5:1), so it is sized by WIDTH, not
+                height: an h-* class on artwork this wide renders it postage
+                stamp size. min-w keeps the logos legible on phones, where the
+                panel scrolls sideways instead. */}
+            <div className="border-t border-white/10">
+                <div className="mx-auto max-w-7xl px-4 py-6">
+                    <div className="mx-auto max-w-5xl overflow-x-auto rounded-xs border border-white/10 bg-paper p-3 sm:p-4">
+                        <img
+                            src="/footer.png"
+                            alt="Accepted payment methods, verified by SSLCommerz"
+                            width={5011}
+                            height={587}
+                            loading="lazy"
+                            className="h-auto w-full min-w-120"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {/* Bottom bar */}
             <div className="border-t border-white/10">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row">
-                    <p className="font-label text-xs text-paper/50">
+                    <p className="text-center font-label text-xs text-paper/50 sm:text-left">
                         © {new Date().getFullYear()} Elmate Stationery. All rights reserved.
+                        <span aria-hidden="true" className="px-2 text-paper/30">
+                            ·
+                        </span>
+                        <span className="whitespace-nowrap">
+                            Developed by{" "}
+                            <a
+                                href="https://strsltd.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-paper/70 underline underline-offset-2 transition-colors hover:text-grass"
+                            >
+                                STR Solutions Ltd
+                            </a>
+                        </span>
                     </p>
 
-                    <div className="flex items-center gap-4">
-                        {/* payment methods — text chips keep it dependency-free */}
-                        <div className="flex items-center gap-1.5">
-                            {["bKash", "Nagad", "Visa", "COD"].map((m) => (
-                                <span
-                                    key={m}
-                                    className="rounded border border-white/15 px-2 py-1 font-label text-[10px] uppercase tracking-wide text-paper/60"
-                                >
-                                    {m}
-                                </span>
-                            ))}
-                        </div>
-
-                        <div className="flex items-center gap-3 text-paper/70">
-                            <a href="#" aria-label="Facebook" className="hover:text-grass">
-                                <FaFacebook size={18} />
-                            </a>
-                            <a href="#" aria-label="Instagram" className="hover:text-grass">
-                                <FaInstagram size={18} />
-                            </a>
-                        </div>
+                    <div className="flex items-center gap-3 text-paper/70">
+                        <a href="#" aria-label="Facebook" className="hover:text-grass">
+                            <FaFacebook size={18} />
+                        </a>
+                        <a href="#" aria-label="Instagram" className="hover:text-grass">
+                            <FaInstagram size={18} />
+                        </a>
                     </div>
                 </div>
             </div>
