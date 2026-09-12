@@ -206,7 +206,7 @@ export const PRIVACY_PAGE = {
             ],
         },
     ],
-    footnote: "Questions about your data can go to hello@elmate.com.bd and a person will answer.",
+    footnote: "Questions about your data can go to info@footpathbd.com and a person will answer.",
 };
 
 export const TERMS_PAGE = {

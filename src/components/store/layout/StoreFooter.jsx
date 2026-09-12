@@ -105,16 +105,16 @@ export default function StoreFooter() {
                     </p>
                     <div className="mt-5 space-y-2 text-sm text-paper/70">
                         <a
-                            href="mailto:hello@elmate.com"
+                            href="mailto:info@footpathbd.com"
                             className="flex items-center gap-2 hover:text-grass"
                         >
-                            <Mail size={15} /> hello@elmate.com
+                            <Mail size={15} /> info@footpathbd.com
                         </a>
                         <a
-                            href="tel:+8809600000000"
+                            href="tel:+8801811-659152"
                             className="flex items-center gap-2 hover:text-grass"
                         >
-                            <Phone size={15} /> +880 9600 000000
+                            <Phone size={15} /> +880 1811-659152
                         </a>
                     </div>
                 </div>

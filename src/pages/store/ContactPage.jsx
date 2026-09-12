@@ -24,15 +24,15 @@ const CHANNELS = [
     {
         icon: Mail,
         label: "Email",
-        value: "hello@elmate.com.bd",
-        href: "mailto:hello@elmate.com.bd",
+        value: "info@footpathbd.com",
+        href: "mailto:info@footpathbd.com",
         note: "Answered within one working day.",
     },
     {
         icon: Phone,
         label: "Phone and WhatsApp",
-        value: "+880 1700 000000",
-        href: "tel:+8801700000000",
+        value: "+880 1811-659152",
+        href: "tel:+8801811659152",
         note: "Saturday to Thursday, 10am to 7pm.",
     },
 ];
